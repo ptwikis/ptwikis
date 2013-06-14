@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+        <title>{{ title |safe }}</title>
+
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='Tool_labs_logo.ico') |safe }}" />
+        <link rel="stylesheet" type="text/css" media="screen" href="{{ url_for('static', filename='style.css') |safe }}"/>
+
+        <script language="Javascript">
+
+function user(e) {
+    if (e.keyCode == 13) {
+        var username = document.getElementById("user");
+        location.href = location.href.substring(0, location.href.lastIndexOf("/")) + "/Usuário:" + username.value ;
+        return false;
+    }
+}
+
+        </script>
+  </head>
+    <body>
+        <div id="content-wrapper">
+            <div id="menu">
+<img src="http://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Tool_labs_logo.svg/120px-Tool_labs_logo.svg.png">
+                <div id="menu-content">
+<div id="menu-item"><a href="{{ url_for('index') }}">Página principal</a></div>
+<div id="menu-item"><a href="{{ url_for('index', page='Usuário') }}">Edições e direitos</a></div>
+                </div>
+            </div>
+            <div id="content">
+<br/>
+<h1>{{ title }}</h1>
+<hr/> Tool Labs – Ferramentas para projetos lusófonos
+<br/>
+{% if user %}
+
+<table class="wikitable">
+    <tr>
+        <td style="border:0; background-color:white"></td>
+        <th>
+<img src="//upload.wikimedia.org/wikipedia/commons/thumb/6/63/Wikipedia-logo.png/50px-Wikipedia-logo.png"/>
+<br/><small><a href="http://pt.wikipedia.org/wiki/Página_principal">Wikipédia</a></small>
+        </th>
+        <th>
+<img src="//upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Wikibooks-logo.png/50px-Wikibooks-logo.png"/>
+<br/><small><a href="http://pt.wikibooks.org/wiki/Página_principal">Wikilivros</a></small>
+        </th>
+        <th>
+<img src="//upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Wiktionary-logo.svg/54px-Wiktionary-logo.svg.png"/>
+<br/><small><a href="http://pt.wiktionary.org/wiki/Página_principal">Wikicionário</a></small>
+        </th>
+        <th>
+<img style="margin:7px 0 7px" src="//upload.wikimedia.org/wikipedia/commons/thumb/2/24/Wikinews-logo.svg/70px-Wikinews-logo.svg.png"/>
+<br/><small><a href="http://pt.wikinews.org/wiki/Página_principal">Wikinotícias</a></small>
+        </th>
+        <th>
+<img src="http://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Wikiversity-logo.svg/60px-Wikiversity-logo.svg.png"/>
+<br/><small><a href="http://pt.wikiversity.org/wiki/Página_principal">Wikiversidade</a></small>
+        </th>
+        <th>
+<img src="//upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Wikiquote-logo.svg/45px-Wikiquote-logo.svg.png"/>
+<br/><small><a href="http://pt.wikiquote.org/wiki/Página_principal">Wikiquote</a></small>
+        </th>
+        <th>
+<img src="//upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Wikisource-logo.svg/50px-Wikisource-logo.svg.png"/>
+<br/><small><a href="http://pt.wikisource.org/wiki/Página_principal">Wikisource</a></small>
+        </th>
+        <th>
+<img src="//upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Wikivoyage-logo.svg/50px-Wikivoyage-logo.svg.png"/>
+<br/><small><a href="http://pt.wikivoyage.org/wiki/Página_principal">Wikivoyage</a></small>
+        </th>
+    </tr>
+    <tr>
+        <th>Primeira edição</th>
+        <td>{{ time_ptwiki |safe }}</td>
+        <td>{{ time_ptwikibooks |safe }}</td>
+        <td>{{ time_ptwiktionary |safe }}</td>
+        <td>{{ time_ptwikinews |safe }}</td>
+        <td>{{ time_ptwikiversity |safe }}</td>
+        <td>{{ time_ptwikiquote |safe }}</td>
+        <td>{{ time_ptwikisource |safe }}</td>
+        <td>{{ time_ptwikivoyage |safe }}</td>
+    </tr>
+    <tr>
+        <th>Edições totais</th>
+        <td>{{ total_ptwiki }}</td>
+        <td>{{ total_ptwikibooks }}</td>
+        <td>{{ total_ptwiktionary }}</td>
+        <td>{{ total_ptwikinews }}</td>
+        <td>{{ total_ptwikiversity }}</td>
+        <td>{{ total_ptwikiquote }}</td>
+        <td>{{ total_ptwikisource }}</td>
+        <td>{{ total_ptwikivoyage }}</td>
+    </tr>
+    <tr>
+        <th>Edições no domínio principal</th>
+        <td>{{ main_ptwiki }}</td>
+        <td>{{ main_ptwikibooks }}</td>
+        <td>{{ main_ptwiktionary }}</td>
+        <td>{{ main_ptwikinews }}</td>
+        <td>{{ main_ptwikiversity }}</td>
+        <td>{{ main_ptwikiquote }}</td>
+        <td>{{ main_ptwikisource }}</td>
+        <td>{{ main_ptwikivoyage }}</td>
+    </tr>
+    <tr>
+        <th>Páginas criadas no domínio principal</th>
+        <td>{{ created_ptwiki }}</td>
+        <td>{{ created_ptwikibooks }}</td>
+        <td>{{ created_ptwiktionary }}</td>
+        <td>{{ created_ptwikinews }}</td>
+        <td>{{ created_ptwikiversity }}</td>
+        <td>{{ created_ptwikiquote }}</td>
+        <td>{{ created_ptwikisource }}</td>
+        <td>{{ created_ptwikivoyage }}</td>
+    </tr>
+    <tr>
+        <th>Direito ao voto</th>
+        <td>{{ vote_ptwiki |safe }}</td>
+        <td>{{ vote_ptwikibooks |safe }}</td>
+        <td>{{ vote_ptwiktionary |safe }}</td>
+        <td>{{ vote_ptwikinews |safe }}</td>
+        <td>{{ vote_ptwikiversity |safe }}</td>
+        <td>{{ vote_ptwikiquote |safe }}</td>
+        <td>{{ vote_ptwikisource |safe }}</td>
+        <td>{{ vote_ptwikivoyage |safe }}</td>
+    </tr>
+    <tr>
+        <th>Administrador</th>
+        <td>{{ sysop_ptwiki |safe }}</td>
+        <td>{{ sysop_ptwikibooks |safe }}</td>
+        <td>{{ sysop_ptwiktionary |safe }}</td>
+        <td>{{ sysop_ptwikinews |safe }}</td>
+        <td>{{ sysop_ptwikiversity |safe }}</td>
+        <td>{{ sysop_ptwikiquote |safe }}</td>
+        <td>{{ sysop_ptwikisource |safe }}</td>
+        <td>{{ sysop_ptwikisource |safe }}</td>
+    </tr>
+    <tr>
+        <th>Outros direitos</th>
+        <td>{{ others_ptwiki |safe }}</td>
+        <td>{{ others_ptwikibooks |safe }}</td>
+        <td>{{ others_ptwiktionary |safe }}</td>
+        <td>{{ others_ptwikinews |safe }}</td>
+        <td>{{ others_ptwikiversity |safe }}</td>
+        <td>{{ others_ptwikiquote |safe }}</td>
+        <td>{{ others_ptwikisource |safe }}</td>
+        <td>{{ others_ptwikivoyage |safe }}</td>
+    </tr>
+</table>
+{% else %}
+
+<table style="margin:50px auto 5px auto"><tr><td>Usuário:</td><td><input id="user" type="text" onkeypress="return user(event)"/></td></tr></table>
+<br /><br /><br /><br />
+{% endif %}
+{{ error |safe }}
+            </div>
+       </div>
+       <div style="text-align:center; font-size:x-small; margin: 5px 5px 12px 181px">Powred by <a href="http://flask.pocoo.org/">Flask</a>. O <a href="https://bitbucket.org/danilomac/ptwikis/src">código-fonte</a> desta página é disponibilizado sob a liçensa GNU General Public License 3.0 (GPL V3).</div>
+    </body>
+</html>
