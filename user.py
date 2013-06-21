@@ -1,10 +1,10 @@
 # -*- coding: utf-8  -*-
-import os
+import os, oursql
 from datetime import date
 
 def EditsAndRights(user):
     # 'nome da wiki no banco de dados': (tempo-voto, edições-voto, tempo-administrador, edições-administrador, outro-nome, outro-tempo, outro-edições)
-    ptwikis = {'ptwiki': (90, 300, 182, 2000, 'eliminador', 182, 1000)),
+    ptwikis = {'ptwiki': (90, 300, 182, 2000, 'eliminador', 182, 1000),
                'ptwikibooks': (30, 50),
                'ptwikiversity': (45, 0),
                'ptwiktionary': (30, 200, 30, 100),
@@ -24,11 +24,11 @@ def EditsAndRights(user):
         c.execute('''SELECT (CASE page_namespace WHEN 0 THEN "main" ELSE "others" END) AS namespace, COUNT(*), SUM(page_is_new), MIN(rev_timestamp) FROM revision_userindex FULL JOIN page ON page_id = rev_page WHERE rev_user_text = ? GROUP BY namespace''', (user,))
         r = c.fetchall()
         if not r:
-            response[wiki] = {'time': u'Nunca editou', 'total': u'0', 'main': u'0', 'created': u'0', 'vote': u'Não', 'sysop': u'Não', 'others': u'—'}
+            response[wiki] = {'time': u'Nunca editou', 'total': u'0', 'main': u'0', 'created': u'0', 'vote': u'—', 'sysop': u'—', 'others': u'—'}
             continue
         c.execute('SELECT ug_group FROM user LEFT JOIN user_groups ON user_id = ug_user WHERE user_name = ?', (user,))
         g = c.fetchall()
-        g = g and [i in groups and groups[i] or i for i in map(lambda i:i[0], g)] or []
+        g = g and [i in groups and groups[i] or i for i in map(lambda i:i[0], g) if i] or []
         # Tempo desde a primeira edição
         t = len(r) == 2 and min(r[0][3], r[1][3]) or r[0][3]
         days = (date.today() - date(int(t[0:4]), int(t[4:6]), int(t[6:8]))).days
@@ -50,12 +50,12 @@ def EditsAndRights(user):
                 u'<span style="color:#800">Não pode</span><br/><small>menos de {} dias{}</small>'.format(ptwikis[wiki][2],
                 main < ptwikis[wiki][1] and u' e de {} edições'.format(ptwikis[wiki][1]))) or u'—'
         # Outros direitos
-        others = ptwikis[wiki] and len(ptwikis[wiki]) == 7 and  ptwikis[wiki][4] not in g and (days >= ptwikis[wiki][2] and
+        others = ptwikis[wiki] and len(ptwikis[wiki]) == 7 and 'sysop' not in g and ptwikis[wiki][4] not in g and (days >= ptwikis[wiki][2] and
                 (main >= ptwikis[wiki][3] and u'Pode candidatar-se a {}'.format(ptwikis[wiki][4]) or
                 u'<span style="color:#800">Não pode candidatar-se a {}</span><br/><small>menos de {} edições</small>'.format(ptwikis[wiki][4], ptwikis[wiki][6])) or
                 u'<span style="color:#800">Não pode candidatar-se a {}</span><br/><small>menos de {} dias{}</small>'.format(ptwikis[wiki][4], ptwikis[wiki][5],
                 total < ptwikis[wiki][1] and u' e de {} edições'.format(ptwikis[wiki][6]))) or None
-        others = g and u'<br />'.join((others and [others] or []) + [u'<span style="color:#080"><b>É {}</b></span>'.format(i) for i in g]) or others or u'—'
+        others = g and u'<br />'.join((others and [others] or []) + [u'<span style="color:#080"><b>É {}</b></span>'.format(i) for i in g if i != 'sysop']) or others or u'—'
         response[wiki] = {'time': wikitime, 'total': str(total), 'main': str(main), 'created': str(created), 'vote': vote, 'sysop': sysop, 'others': others}
     variables = dict([('{}_{}'.format(item, wiki), response[wiki][item])for wiki in response for item in response[wiki]])
     variables['user'] = user

@@ -1,10 +1,13 @@
 # -*- coding: utf-8  -*-
 from flask import Flask, url_for, render_template
 from urllib import quote
-import re
+import re, logging
+
+logging.basicConfig(filename='views.log',level=logging.DEBUG)
+
 app = Flask(__name__)
 
-reuser = re.compile(ur'[Uu]suário:([\w._!$@*]+)')
+reuser = re.compile(ur'[Uu]suário:(\S+)')
 
 @app.route('/')
 @app.route('/<page>')
@@ -13,10 +16,12 @@ def index(page=None):
         import user
         pagehtml = 'user.html'
         username = reuser.search(page)
-        title = u'Edições e direitos' + (username and u' de ' + username.group(1) or u'')
-        variables = username and user.EditsAndRights(username.group(1)) or {}
+	username = username and username.group(1).replace(u'_', u' ') or None
+        title = u'Edições e direitos' + (username and u' de ' + username or u'')
+        variables = username and user.EditsAndRights(username) or {}
     else:
         pagehtml, title, variables = 'mainpage.html', u'Ferramentas para projetos lusófonos', {}
+    logging.exception('Erro:')
     return render_template(pagehtml, title=title, **variables)
 
 if __name__ == '__main__':

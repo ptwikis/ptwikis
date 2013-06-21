@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 
-        <title>ptwikis</title>
+	<title>{{ title }}</title>
 
         <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='Tool_labs_logo.ico') }}" />
         <link rel="stylesheet" type="text/css" media="screen" href="{{ url_for('static', filename='style.css') }}"/>
@@ -13,7 +13,7 @@
 function user(e) {
     if (e.keyCode == 13) {
         var username = document.getElementById("user");
-        location.href = location.href.substring(0, location.href.lastIndexOf("/")) + "/Usuário:" + username.value ;
+        location.href = location.href.substring(0, location.href.lastIndexOf("/")) + "/Usuário:" + username.value.replace(/ /g, "_");
         return false;
     }
 }
@@ -22,11 +22,10 @@ function user(e) {
   </head>
     <body>
         <div id="content-wrapper">
-            <div id="menu">
-<img src="{{ url_for('static', filename='Tool_labs_logo.png') }}">
+		<div id="menu">
+<img src="//upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Tool_labs_logo.svg/120px-Tool_labs_logo.svg.png">
                 <div id="menu-content">
-<div id="menu-item"><a href="{{ url_for('index') }}">Página principal</a></div>
-<div id="menu-item"><a href="{{ url_for('index', page='Usuário') }}">Edições e direitos</a></div>
+<div id="menu-item"><a href="./">Ferramentas</a></div>
                 </div>
             </div>
             <div id="content">
@@ -45,9 +44,12 @@ Este é um projeto desenvolvido no Tool Labs para os projetos lusófonos.
 
             </div>
        </div>
-       <div style="text-align:center; font-size:x-small; margin: 5px 5px 12px 181px">
-Powred by <a href="http://flask.pocoo.org/">Flask</a>. 
-O <a href="https://bitbucket.org/danilomac/ptwikis/src">código-fonte</a> desta página é disponibilizado sob a liçensa GNU General Public License 3.0 (GPL V3).</div>
+       <div style="float: right; margin: 10px 8px">
+<a href="http://flask.pocoo.org/"><img src="http://flask.pocoo.org/static/badges/made-with-flask-s.png" border="0" alt="made with Flask" title="made with Flask"></a>
+       </div>
+       <div style="text-align:center; font-size:x-small; margin: 10px 10px 12px 181px">
+O <a href="https://bitbucket.org/danilomac/ptwikis/src">código-fonte</a> desta página é disponibilizado sob a liçensa GNU General Public License 3.0 (GPL V3).
+       </div>
     </body>
 </html>
 
