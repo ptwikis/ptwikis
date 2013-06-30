@@ -12,8 +12,10 @@
 
 function user(e) {
     if (e.keyCode == 13) {
-        var username = document.getElementById("user");
-        location.href = location.href.substring(0, location.href.lastIndexOf("/")) + "/Usuário:" + username.value.replace(/ /g, "_");
+	var username = document.getElementById("user");
+	username = username.value.replace(/ /g, "_");
+        username = username.charAt(0).toUpperCase() + username.slice(1);
+        location.href = location.href.substring(0, location.href.lastIndexOf("/")) + "/Usuário:" + username;
         return false;
     }
 }
@@ -153,8 +155,8 @@ function user(e) {
 {{ error |safe }}
             </div>
         </div>
-	<div style="float: right; margin: 10px 8px">
-<a href="http://flask.pocoo.org/"><img src="http://flask.pocoo.org/static/badges/made-with-flask-s.png" border="0" alt="made with Flask" title="made with Flask"></a>
+	<div style="float: right; margin: 10px 8px; font-size:x-small">
+Feito com <a href="http://flask.pocoo.org/">Flask</a>
 	</div>
         <div style="text-align:center; font-size:x-small; margin: 10px 10px 12px 181px">
 O <a href="https://bitbucket.org/danilomac/ptwikis/src">código-fonte</a> desta página é disponibilizado sob a liçensa GNU General Public License 3.0 (GPL V3).

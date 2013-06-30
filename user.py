@@ -12,7 +12,8 @@ def EditsAndRights(user):
                'ptwikiquote': (30, 100),
                'ptwikisource': (45, 100),
                'ptwikivoyage': None}
-    groups = {'autoreviewer': 'autorrevisor', 'rollbacker': 'removedor', 'bureaucrat': 'burocrata', 'checkuser': 'verificador' ,'oversight': 'supervisor'}
+    groups = {'autoreviewer': 'autorrevisor', 'rollbacker': 'reversor', 'bureaucrat': 'burocrata', 'checkuser': 'verificador' ,'oversight': 'supervisor',
+              'reviewer': 'revisor', 'import': 'importador'}
     response = {}
     for wiki in ptwikis:
         try:
