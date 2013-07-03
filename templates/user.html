@@ -1,41 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-    <head>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-
-        <title>{{ title |safe }}</title>
-
-        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='Tool_labs_logo.ico') |safe }}" />
-        <link rel="stylesheet" type="text/css" media="screen" href="{{ url_for('static', filename='style.css') |safe }}"/>
-
-        <script language="Javascript">
-
-function user(e) {
-    if (e.keyCode == 13) {
-	var username = document.getElementById("user");
-	username = username.value.replace(/ /g, "_");
-        username = username.charAt(0).toUpperCase() + username.slice(1);
-        location.href = location.href.substring(0, location.href.lastIndexOf("/")) + "/Usuário:" + username;
-        return false;
-    }
-}
-
-        </script>
-  </head>
-    <body>
-        <div id="content-wrapper">
-            <div id="menu">
-<img src="//upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Tool_labs_logo.svg/120px-Tool_labs_logo.svg.png">
-                <div id="menu-content">
-<div id="menu-item"><a href="./">Ferramentas</a></div>
-                </div>
-            </div>
-            <div id="content">
-<br/>
-<h1>{{ title }}</h1>
-<hr/> Tool Labs – Ferramentas para projetos lusófonos
-<br/>
-
+{% extends "base.html" %}
+{% block content %}
 <table class="wikitable">
     <tr>
         <td style="border:0; background-color:white"></td>
@@ -152,14 +116,4 @@ function user(e) {
 </table>
 <br/>
 <table style="margin:50px auto 5px auto"><tr><td>Usuário:</td><td><input id="user" type="text" onkeypress="return user(event)"/></td></tr></table>
-{{ error |safe }}
-            </div>
-        </div>
-	<div style="float: right; margin: 10px 8px; font-size:x-small">
-Feito com <a href="http://flask.pocoo.org/">Flask</a>
-	</div>
-        <div style="text-align:center; font-size:x-small; margin: 10px 10px 12px 181px">
-O <a href="https://bitbucket.org/danilomac/ptwikis/src">código-fonte</a> desta página é disponibilizado sob a liçensa GNU General Public License 3.0 (GPL V3).
-	</div>
-    </body>
-</html>
+{{ error |safe }}{% endblock %}

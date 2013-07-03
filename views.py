@@ -1,28 +1,33 @@
 # -*- coding: utf-8  -*-
 from flask import Flask, url_for, render_template
 from urllib import quote
-import re, logging
-
-logging.basicConfig(filename='views.log',level=logging.DEBUG)
+import re, os
 
 app = Flask(__name__)
 
-reuser = re.compile(ur'[Uu]suário:(\S+)')
-
 @app.route('/')
-@app.route('/<page>')
 def index(page=None):
-    if page and page.lower().startswith(u'usuário'):
-        import user
-        pagehtml = 'user.html'
-        username = reuser.search(page)
-	username = username and username.group(1).replace(u'_', u' ') or None
-        title = u'Edições e direitos' + (username and u' de ' + username or u'')
-        variables = username and user.EditsAndRights(username) or {}
-    else:
-        pagehtml, title, variables = 'mainpage.html', u'Ferramentas para projetos lusófonos', {}
-    logging.exception('Erro:')
-    return render_template(pagehtml, title=title, **variables)
+    return render_template('mainpage.html', title=u'Ferramentas para projetos lusófonos')
+
+@app.route(u'/Usuário:<username>')
+def user(username=None):
+    import user
+    if username:
+        username = username.replace(u'_', u' ')
+    title = u'Edições e direitos' + (username and u' de ' + username or u'')
+    variables = username and user.EditsAndRights(username) or {}
+    return render_template('user.html', title=title, **variables)
+
+@app.route(u'/Teste:<html>')
+def teste(html=None):
+  for f in os.listdir('./templates'):
+   if f == html.lower() + u'.html':
+    return render_template(html.lower() + '.html', title=u'Página de teste:' + html.replace(u'_', u' '))
+  return render_template('page_not_found.html', title=u'Página não encontrada'), 404
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('page_not_found.html', title=u'Página não encontrada'), 404
 
 if __name__ == '__main__':
     app.debug = True
