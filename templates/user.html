@@ -115,5 +115,5 @@
     </tr>
 </table>
 <br/>
-<table style="margin:50px auto 5px auto"><tr><td>Usuário:</td><td><input id="user" type="text" onkeypress="return user(event)"/></td></tr></table>
+<table style="margin:50px auto 5px auto"><tr><td>Usuário:</td><td><input id="user" type="text" onkeypress="return enter(event, this, 'Usuário:')"/></td></tr></table>
 {{ error |safe }}{% endblock %}

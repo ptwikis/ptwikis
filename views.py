@@ -20,7 +20,7 @@ def user(username=None):
 
 @app.route(u'/Teste:<html>')
 def teste(html=None):
-  for f in os.listdir('./templates'):
+  for f in os.listdir('/data/project/ptwikis/ptwikis/templates'):
    if f == html.lower() + u'.html':
     return render_template(html.lower() + '.html', title=u'Página de teste:' + html.replace(u'_', u' '))
   return render_template('page_not_found.html', title=u'Página não encontrada'), 404
