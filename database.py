@@ -1,8 +1,21 @@
 # -*- coding: utf-8  -*-
+"""
+Script para consultas ao banco de dados
+"""
 import os, oursql
 from datetime import date
 
+def conn(wiki):
+    try:
+        connection = oursql.connect(db=wiki + '_p', host=wiki + '.labsdb', read_default_file=os.path.expanduser('~/replica.my.cnf'))
+        return connection.cursor()
+    except:
+        return False
+
 def EditsAndRights(user):
+    """
+    Consulta as edições de usuários em todas os projetos lusófonos
+    """
     # 'nome da wiki no banco de dados': (tempo-voto, edições-voto, tempo-administrador, edições-administrador, outro-nome, outro-tempo, outro-edições)
     ptwikis = {'ptwiki': (90, 300, 182, 2000, 'eliminador', 182, 1000),
                'ptwikibooks': (30, 50),
@@ -16,13 +29,21 @@ def EditsAndRights(user):
               'reviewer': 'revisor', 'import': 'importador'}
     response = {}
     for wiki in ptwikis:
-        try:
-            conn = oursql.connect(db=wiki + '_p', host=wiki + '.labsdb', read_default_file=os.path.expanduser('~/replica.my.cnf'))
-        except:
+        c = conn(wiki)
+        if not c:
             response[wiki] = {'time': u'Erro', 'total': u'Erro', 'main': u'Erro', 'created': u'Erro', 'vote': u'', 'sysop': u'', 'others': u''}
             continue
-        c = conn.cursor()
-        c.execute('''SELECT (CASE page_namespace WHEN 0 THEN "main" ELSE "others" END) AS namespace, COUNT(*), SUM(page_is_new), MIN(rev_timestamp) FROM revision_userindex FULL JOIN page ON page_id = rev_page WHERE rev_user_text = ? GROUP BY namespace''', (user,))
+        #Consulta edições totais, páginas criadas e primeira edição, separando em domínio principal (main) e outros domínios (others)
+        c.execute('''SELECT
+ (CASE page_namespace WHEN 0 THEN "main" ELSE "others" END) AS namespace,
+ COUNT(*),
+ SUM(page_is_new),
+ MIN(rev_timestamp)
+ FROM revision_userindex
+ FULL JOIN page
+ ON page_id = rev_page
+ WHERE rev_user_text = ?
+ GROUP BY namespace''', (user,))
         r = c.fetchall()
         if not r:
             response[wiki] = {'time': u'Nunca editou', 'total': u'0', 'main': u'0', 'created': u'0', 'vote': u'—', 'sysop': u'—', 'others': u'—'}
@@ -61,7 +82,3 @@ def EditsAndRights(user):
     variables = dict([('{}_{}'.format(item, wiki), response[wiki][item])for wiki in response for item in response[wiki]])
     variables['user'] = user
     return variables
-
-
-
-if __name__ == '__main__': EditsAndRights('eu')
