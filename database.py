@@ -5,6 +5,13 @@ Script para consultas ao banco de dados
 import os, oursql
 from datetime import date
 
+def template(t):
+    functions = {u'Patrulhamento_de_IPs': 'ippatrol'}
+    if t in functions:
+        return eval(functions[t] + '()')
+    else:
+        return {}
+
 def conn(wiki):
     try:
         connection = oursql.connect(db=wiki + '_p', host=wiki + '.labsdb', read_default_file=os.path.expanduser('~/replica.my.cnf'))
@@ -82,3 +89,21 @@ def EditsAndRights(user):
     variables = dict([('{}_{}'.format(item, wiki), response[wiki][item])for wiki in response for item in response[wiki]])
     variables['user'] = user
     return variables
+
+def ippatrol():
+    c = conn('ptwiki')
+    if c:
+        c.execute('''SELECT
+ SUBSTR(rc_timestamp, 1, 10) AS HORA,
+ COUNT(*),
+ SUM(rc_patrolled)
+ FROM recentchanges
+ WHERE rc_namespace = 0 AND rc_user = 0 AND rc_type != 5
+ GROUP BY HORA
+ ORDER BY rc_id DESC
+ LIMIT 168''')
+        r = c.fetchall()
+        r = {'iphquery': ','.join([(x in r[6::6] and '\n[{},{},{}]' or '[{},{},{}]').format(*x) for x in r])}
+    else:
+        r = {}
+    return r

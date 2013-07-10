@@ -32,7 +32,7 @@ def consulta(query=None):
 @app.route(u'/<html>')
 def htmlpage(html=None):
     if html + u'.html' in os.listdir(app.root_path + '/templates'):
-        return render_template(html + '.html', title=html.replace(u'_', u' '))
+        return render_template(html + '.html', title=html.replace(u'_', u' '), **database.template(html))
     else:
         return page_not_found(404)
 
@@ -44,3 +44,4 @@ if __name__ == '__main__':
     app.debug = True
     from flup.server.fcgi_fork import WSGIServer
     WSGIServer(app).run()
+    #app.run()  # Utilize esta linha e comente as duas acima para rodar localmente
