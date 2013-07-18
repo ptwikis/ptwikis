@@ -1,39 +1,40 @@
 {% extends "base.html" %}
+{% block title %}Edições e direitos de {{user}}{% endblock %}
 {% block content %}
 <table class="wikitable">
     <tr>
         <td style="border:0; background-color:white"></td>
         <th>
 <img src="//upload.wikimedia.org/wikipedia/commons/thumb/6/63/Wikipedia-logo.png/50px-Wikipedia-logo.png"/>
-<br/><small><a href="http://pt.wikipedia.org/wiki/Página_principal">Wikipédia</a></small>
+<br/><small><a href="//pt.wikipedia.org/wiki/Página_principal">Wikipédia</a></small>
         </th>
         <th>
 <img src="//upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Wikibooks-logo.png/50px-Wikibooks-logo.png"/>
-<br/><small><a href="http://pt.wikibooks.org/wiki/Página_principal">Wikilivros</a></small>
+<br/><small><a href="//pt.wikibooks.org/wiki/Página_principal">Wikilivros</a></small>
         </th>
         <th>
 <img src="//upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Wiktionary-logo.svg/54px-Wiktionary-logo.svg.png"/>
-<br/><small><a href="http://pt.wiktionary.org/wiki/Página_principal">Wikicionário</a></small>
+<br/><small><a href="//pt.wiktionary.org/wiki/Página_principal">Wikicionário</a></small>
         </th>
         <th>
 <img style="margin:7px 0 7px" src="//upload.wikimedia.org/wikipedia/commons/thumb/2/24/Wikinews-logo.svg/70px-Wikinews-logo.svg.png"/>
-<br/><small><a href="http://pt.wikinews.org/wiki/Página_principal">Wikinotícias</a></small>
+<br/><small><a href="//pt.wikinews.org/wiki/Página_principal">Wikinotícias</a></small>
         </th>
         <th>
 <img src="http://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Wikiversity-logo.svg/60px-Wikiversity-logo.svg.png"/>
-<br/><small><a href="http://pt.wikiversity.org/wiki/Página_principal">Wikiversidade</a></small>
+<br/><small><a href="//pt.wikiversity.org/wiki/Página_principal">Wikiversidade</a></small>
         </th>
         <th>
 <img src="//upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Wikiquote-logo.svg/45px-Wikiquote-logo.svg.png"/>
-<br/><small><a href="http://pt.wikiquote.org/wiki/Página_principal">Wikiquote</a></small>
+<br/><small><a href="//pt.wikiquote.org/wiki/Página_principal">Wikiquote</a></small>
         </th>
         <th>
 <img src="//upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Wikisource-logo.svg/50px-Wikisource-logo.svg.png"/>
-<br/><small><a href="http://pt.wikisource.org/wiki/Página_principal">Wikisource</a></small>
+<br/><small><a href="//pt.wikisource.org/wiki/Página_principal">Wikisource</a></small>
         </th>
         <th>
 <img src="//upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Wikivoyage-logo.svg/50px-Wikivoyage-logo.svg.png"/>
-<br/><small><a href="http://pt.wikivoyage.org/wiki/Página_principal">Wikivoyage</a></small>
+<br/><small><a href="//pt.wikivoyage.org/wiki/Página_principal">Wikivoyage</a></small>
         </th>
     </tr>
     <tr>
@@ -49,14 +50,14 @@
     </tr>
     <tr>
         <th>Edições totais</th>
-        <td>{{ total_ptwiki }}</td>
-        <td>{{ total_ptwikibooks }}</td>
-        <td>{{ total_ptwiktionary }}</td>
-        <td>{{ total_ptwikinews }}</td>
-        <td>{{ total_ptwikiversity }}</td>
-        <td>{{ total_ptwikiquote }}</td>
-        <td>{{ total_ptwikisource }}</td>
-        <td>{{ total_ptwikivoyage }}</td>
+        <td><a href="//pt.wikipedia.org/wiki/Especial:Contribui%C3%A7%C3%B5es/{{user|replace(" ", "_")}}">{{ total_ptwiki }}</a></td>
+        <td><a href="//pt.wikibooks.org/wiki/Especial:Contribui%C3%A7%C3%B5es/{{user|replace(" ", "_")}}">{{ total_ptwikibooks }}</a></td>
+        <td><a href="//pt.wiktionary.org/wiki/Especial:Contribui%C3%A7%C3%B5es/{{user|replace(" ", "_")}}">{{ total_ptwiktionary }}</a></td>
+        <td><a href="//pt.wikinews.org/wiki/Especial:Contribui%C3%A7%C3%B5es/{{user|replace(" ", "_")}}">{{ total_ptwikinews }}</a></td>
+        <td><a href="//pt.wikiversity.org/wiki/Especial:Contribui%C3%A7%C3%B5es/{{user|replace(" ", "_")}}">{{ total_ptwikiversity }}</a></td>
+        <td><a href="//pt.wikiquote.org/wiki/Especial:Contribui%C3%A7%C3%B5es/{{user|replace(" ", "_")}}">{{ total_ptwikiquote }}</a></td>
+        <td><a href="//pt.wikisource.org/wiki/Especial:Contribui%C3%A7%C3%B5es/{{user|replace(" ", "_")}}">{{ total_ptwikisource }}</a></td>
+        <td><a href="//pt.wikivoyage.org/wiki/Especial:Contribui%C3%A7%C3%B5es/{{user|replace(" ", "_")}}">{{ total_ptwikivoyage }}</a></td>
     </tr>
     <tr>
         <th>Edições no domínio principal</th>
