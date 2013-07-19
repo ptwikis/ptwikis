@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Edições e direitos de {{user}}{% endblock %}
+{% block title %}Edições e grupos de {{user}}{% endblock %}
 {% block content %}
 <table class="wikitable">
     <tr>
@@ -104,7 +104,7 @@
         <td>{{ sysop_ptwikisource |safe }}</td>
     </tr>
     <tr>
-        <th>Outros direitos</th>
+        <th>Outros grupos</th>
         <td>{{ others_ptwiki |safe }}</td>
         <td>{{ others_ptwikibooks |safe }}</td>
         <td>{{ others_ptwiktionary |safe }}</td>
@@ -116,5 +116,10 @@
     </tr>
 </table>
 <br/>
-<table style="margin:50px auto 5px auto"><tr><td>Usuário:</td><td><input id="user" type="text" onkeypress="return enter(event, this, 'Usuário:')"/></td></tr></table>
+<table style="margin: 4em auto 15em auto;">
+  <tr>
+    <td>Usuário:</td>
+    <td><input id="user" type="text" onkeypress="return enter(event, this, 'Usuário:')"/></td>
+  </tr>
+</table>
 {{ error |safe }}{% endblock %}
