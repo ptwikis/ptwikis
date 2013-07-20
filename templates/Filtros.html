@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<p>Ações de filtros nos últimos 30 dias:</p>
+<br/>
+<p><b>Legenda: <span style="background-color:lightgreen">&nbsp; Correspondências sem ação &nbsp;</span> 
+<span style="background-color:#55F; color:white">&nbsp; Avisos &nbsp;</span> 
+<span style="background-color:gold">&nbsp; Etiquetas &nbsp;</span> 
+<span style="background-color:red; color:white">&nbsp; Desautorizações &nbsp;</span></b></p>
+  </tr>
+{% if filters %}
+<table style="width:100%" border=1 rules=rows frame=none bordercolor=lightgray>
+{%- for f, n, a, e, d in filters %}
+<tr>
+  <td style="width:50px; font-size:1.8em; margin:5px 5px 5px 5px"><a href="//pt.wikipedia.org/wiki/Especial:Filtro_de_abusos/{{ f }}">{{ f }}</a></td>
+  <td style="font-size:x-small">{% if n %}
+    <div style="width:{{ (n * 100 / max)|round(1) }}%; height:10px; background-color:lightgreen" title="{{ n }} correspondências sem ações"></div>{% endif %}{% if a %}
+    <div style="width:{{ (a * 100 / max)|round(1) }}%; height:10px; background-color:#55F" title="{{ a }} avisos"></div>{% endif %}{% if e %}
+    <div style="width:{{ (e * 100 / max)|round(1) }}%; height:10px; background-color:gold" title="{{ e }} etiquetas"></div>{% endif %}{% if d %}
+    <div style="width:{{ (d * 100 / max)|round(1) }}%; height:10px; background-color:red" title="{{ d }} desautorizações"></div>{% endif %}
+</tr>
+{%- endfor %}
+</table>
+{% else %}
+ERRO
+{% endif %}
+{% endblock %}

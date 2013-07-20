@@ -2,14 +2,21 @@
 {% block content %}
 
 Este é um projeto desenvolvido no Tool Labs para os projetos lusófonos.
-<h2 style="display: block; margin-top: 1em;">Edições e grupos de usuário</h2><hr />
-
-<table style="margin: 4em auto 15em auto;">
+<h3 style="display: block; margin-top: 1em;">Edições e grupos de usuário</h3>
+<p>Exibe para um determidado usuário o número de edições totais e no domínio principal, número de páginas criadas no domínio principal, direito a voto, 
+grupos a que o usuário pertence e direito de se candidatar a administrador e eliminador.</p>
+<table style="margin: 1em auto 2em auto;">
   <tr>
-    <td>Usuário:</td>
+    <td><b>Usuário:</b></td>
     <td><input id="user" type="text" onkeypress="return enter(event, this, 'Usuário:')"/></td>
   </tr>
 </table>
+
+<h3 style="display: block; margin-top: 1em;"><a href="Patrulhamento_de_IPs">Patrulhamento de IPs</a></h3>
+<p>Gráfico das edições de IPs e edições de IPs patrulhadas por hora nos últimos 7 dias.</p>
+
+<h3 style="display: block; margin-top: 1em;"><a href="Filtros">Filtros</a></h3>
+<p>Gráfico dos registros de ações dos filtros nos últimos 30 dias.</p>
 
 {% endblock %}
 
