@@ -9,14 +9,15 @@
   </tr>
 {% if filters %}
 <table style="width:100%" border=1 rules=rows frame=none bordercolor=lightgray>
-{%- for f, n, a, e, d in filters %}
+{%- for f, t, n, a, e, d in filters %}
 <tr>
-  <td style="width:50px; font-size:1.8em; margin:5px 5px 5px 5px"><a href="//pt.wikipedia.org/wiki/Especial:Filtro_de_abusos/{{ f }}">{{ f }}</a></td>
+  <td style="width:50px; font-size:1.8em; margin:5px 5px 5px 5px">
+    <a href="//pt.wikipedia.org/wiki/Especial:Filtro_de_abusos/{{ f }}" title="{{ t }}">{{ f }}</a></td>
   <td style="font-size:x-small">{% if n %}
-    <div style="width:{{ (n * 100 / max)|round(1) }}%; height:10px; background-color:lightgreen" title="{{ n }} correspondências sem ações"></div>{% endif %}{% if a %}
-    <div style="width:{{ (a * 100 / max)|round(1) }}%; height:10px; background-color:#55F" title="{{ a }} avisos"></div>{% endif %}{% if e %}
-    <div style="width:{{ (e * 100 / max)|round(1) }}%; height:10px; background-color:gold" title="{{ e }} etiquetas"></div>{% endif %}{% if d %}
-    <div style="width:{{ (d * 100 / max)|round(1) }}%; height:10px; background-color:red" title="{{ d }} desautorizações"></div>{% endif %}
+    <div style="width:{{ (n * 100 / max)|round(1) }}%; height:10px; background-color:lightgreen" title="{{ n }} correspondências sem ações sobre {{ t|lower }}"></div>{% endif %}{% if a %}
+    <div style="width:{{ (a * 100 / max)|round(1) }}%; height:10px; background-color:#55F" title="{{ a }} avisos sobre {{ t|lower }}"></div>{% endif %}{% if e %}
+    <div style="width:{{ (e * 100 / max)|round(1) }}%; height:10px; background-color:gold" title="{{ e }} etiquetas sobre {{ t|lower }}"></div>{% endif %}{% if d %}
+    <div style="width:{{ (d * 100 / max)|round(1) }}%; height:10px; background-color:red" title="{{ d }} desautorizações sobre {{ t|lower }}"></div>{% endif %}
 </tr>
 {%- endfor %}
 </table>

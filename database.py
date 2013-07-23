@@ -115,18 +115,23 @@ def filterActions():
     c = conn('ptwiki')
     if c:
         c.execute('''SELECT
- afl_filter,
- SUM(CASE WHEN afl_actions = '' THEN 1 ELSE 0 END),
- SUM(CASE WHEN afl_actions = 'warn' THEN 1 ELSE 0 END),
- SUM(CASE WHEN afl_actions = 'tag' THEN 1 ELSE 0 END),
- SUM(CASE WHEN afl_actions = 'disallow' THEN 1 ELSE 0 END)
+ F, af_public_comments, N, A, E, D
+ FROM (
+ SELECT
+ afl_filter AS F,
+ SUM(CASE WHEN afl_actions = '' THEN 1 ELSE 0 END) AS N,
+ SUM(CASE WHEN afl_actions = 'warn' THEN 1 ELSE 0 END) AS A,
+ SUM(CASE WHEN afl_actions = 'tag' THEN 1 ELSE 0 END) AS E,
+ SUM(CASE WHEN afl_actions = 'disallow' THEN 1 ELSE 0 END) AS D
  FROM abuse_filter_log
  WHERE afl_timestamp > DATE_FORMAT(SUBDATE(NOW(), INTERVAL 30 DAY), '%Y%m%d%H%i%s')
- GROUP BY afl_filter
- ORDER BY CAST(afl_filter AS INT)''')
+ GROUP BY afl_filter) AS stats
+ LEFT JOIN abuse_filter
+ ON F = af_id
+ ORDER BY CAST(F AS INT)''')
         r = c.fetchall()
-        r = [map(int, f) for f in r]
-        r = {'filters': r, 'max': max(map(max, r))}
+        r = [(int(f), t and t.decode('utf8') or u'', int(n), int(a), int(e), int(d)) for f, t, n, a, e, d in r]
+        r = {'filters': r, 'max': max(map(max, [f[2:] for f in r]))}
     else:
         r = {}
     return r
