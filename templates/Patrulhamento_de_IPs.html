@@ -7,7 +7,8 @@
 <style> svg {box-shadow: 0 0 3px} </style>
 {% endblock %}
 {% block content %}
-<p style="font-size:small">O gráfico a seguir se refere às edições IPs (em vermelho) e edições de IPs patrulhadas (em verde) no domínio principal da Wikipédia nos últimos 7 dias.</p>
+<p style="font-size:small">O gráfico a seguir se refere às edições IPs (em vermelho) e edições de IPs patrulhadas (em verde) no domínio principal 
+{% if wiki == "Wikipédia" %}da{% else %}do{% endif %} {{ wiki }} nos últimos 7 dias.</p>
 {% if iphquery %}
 <div id="chart"></div>
 
@@ -64,4 +65,15 @@ var hoverDetail = new Rickshaw.Graph.HoverDetail( {
 {%- else %}
 <span style="color:red"><b>Erro</b></span>
 {%- endif %}
+<select style="margin:1em auto 2em auto; border:1px solid #A7D7F9; background-color:#F6F6F6" onchange="location.href = location.href.substring(0, location.href.lastIndexOf('/')) + '/Patrulhamento_de_IPs:' + this.value">
+  <option value="">Escolha outro projeto</option>
+  <option>Wikipédia</option>
+  <option>Wikilivros</option>
+  <option>Wikcionário</option>
+  <option>Wikiversidade</option>
+  <option>Wikinotícias</option>
+  <option>Wikiquote</option>
+  <option>Wikisource</option>
+  <option>Wikivoyage</option>
+</select>
 {% endblock %}

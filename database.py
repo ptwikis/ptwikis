@@ -5,21 +5,30 @@ Script para consultas ao banco de dados
 import os, oursql
 from datetime import date
 
-def template(page, args=[]):
-    functions = {u'Usuário': 'EditsAndRights(*args)',
-                 u'Patrulhamento_de_IPs': 'ippatrol()',
-                 u'Filtros': u'filterActions()'}
+def template(page, arg):
+    functions = {u'Usuário': EditsAndRights,
+                 u'Patrulhamento_de_IPs': ippatrol,
+                 u'Filtros': filterActions}
     if page in functions:
-        return eval(functions[page])
+        return functions[page](arg)
     else:
         return {}
 
 def conn(wiki):
+    wikis = {u'Wikipédia': 'ptwiki', u'Wikilivros': 'ptwikibooks', u'Wikiversidade': 'ptwikiversity', u'Wikcionário': 'ptwiktionary', u'Wikinotícias': 'ptwikinews',
+             u'Wikiquote': 'ptwikiquote', u'Wikisource': 'ptwikisource', u'Wikivoyage': 'ptwikivoyage'}
+    wiki = wiki in wikis and wikis[wiki] or wiki
     try:
         connection = oursql.connect(db=wiki + '_p', host=wiki + '.labsdb', read_default_file=os.path.expanduser('~/replica.my.cnf'))
         return connection.cursor()
     except:
         return False
+
+def link(wiki):
+    wikis = {u'Wikipédia': 'pt.wikipedia', u'Wikilivros': 'pt.wikibooks', u'Wikiversidade': 'pt.wikiversity', u'Wikcionário': 'pt.wiktionary', u'Wikinotícias': 'pt.wikinews',
+             u'Wikiquote': 'pt.wikiquote', u'Wikisource': 'pt.wikisource', u'Wikivoyage': 'pt.wikivoyage'}
+    link = wiki in wikis and wikis[wiki] or wiki[0:2] +u'.' + (wiki[2:] == u'wiki' and u'wikipedia' or wiki[2:])
+    return link
 
 def EditsAndRights(user):
     """
@@ -93,8 +102,10 @@ def EditsAndRights(user):
     variables['user'] = user
     return variables
 
-def ippatrol():
-    c = conn('ptwiki')
+def ippatrol(wiki=None):
+    if not wiki:
+        wiki = u'Wikipédia'
+    c = conn(wiki)
     if c:
         c.execute('''SELECT
  SUBSTR(rc_timestamp, 1, 10) AS HORA,
@@ -106,13 +117,15 @@ def ippatrol():
  ORDER BY rc_id DESC
  LIMIT 168''')
         r = c.fetchall()
-        r = {'iphquery': ','.join([(x in r[6::6] and '\n[{},{},{}]' or '[{},{},{}]').format(*x) for x in r])}
+        r = {'wiki': wiki, 'link': link(wiki), 'iphquery': ','.join([(x in r[6::6] and '\n[{},{},{}]' or '[{},{},{}]').format(*x) for x in r])}
     else:
         r = {}
     return r
 
-def filterActions():
-    c = conn('ptwiki')
+def filterActions(wiki=None):
+    if not wiki:
+        wiki = u'Wikipédia'
+    c = conn(wiki)
     if c:
         c.execute('''SELECT
  F, af_public_comments, N, A, E, D
@@ -131,7 +144,7 @@ def filterActions():
  ORDER BY CAST(F AS INT)''')
         r = c.fetchall()
         r = [(int(f), t and t.decode('utf8') or u'', int(n), int(a), int(e), int(d)) for f, t, n, a, e, d in r]
-        r = {'filters': r, 'max': max(map(max, [f[2:] for f in r]))}
+        r = {'wiki': wiki, 'link': link(wiki), 'filters': r, 'max': max(map(max, [f[2:] for f in r]))}
     else:
         r = {}
     return r

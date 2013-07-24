@@ -13,10 +13,32 @@ grupos a que o usuário pertence e direito de se candidatar a administrador e el
 </table>
 
 <h3 style="display: block; margin-top: 1em;"><a href="Patrulhamento_de_IPs">Patrulhamento de IPs</a></h3>
-<p>Gráfico das edições de IPs e edições de IPs patrulhadas por hora nos últimos 7 dias.</p>
+<p>Gráfico das edições de IPs e edições de IPs patrulhadas por hora nos últimos 7 dias.<br/>
+<select style="margin:1em auto 2em auto; border:1px solid #A7D7F9; background-color:#F6F6F6" onchange="location.href = location.href.substring(0, location.href.lastIndexOf('/')) + '/Patrulhamento_de_IPs:' + this.value">
+  <option value="">Escolha o projeto</option>
+  <option>Wikipédia</option>
+  <option>Wikilivros</option>
+  <option>Wikcionário</option>
+  <option>Wikiversidade</option>
+  <option>Wikinotícias</option>
+  <option>Wikiquote</option>
+  <option>Wikisource</option>
+  <option>Wikivoyage</option>
+</select></p>
 
 <h3 style="display: block; margin-top: 1em;"><a href="Filtros">Filtros</a></h3>
-<p>Gráfico dos registros de ações dos filtros nos últimos 30 dias.</p>
+<p>Gráfico dos registros de ações dos filtros nos últimos 30 dias.<br/>
+<select style="margin:1em auto 2em auto; border:1px solid #A7D7F9; background-color:#F6F6F6" onchange="location.href = location.href.substring(0, location.href.lastIndexOf('/')) + '/Filtros:' + this.value">
+  <option value="">Escolha o projeto</option>
+  <option>Wikipédia</option>
+  <option>Wikilivros</option>
+  <option>Wikcionário</option>
+  <option>Wikiversidade</option>
+  <option>Wikinotícias</option>
+  <option>Wikiquote</option>
+  <option>Wikisource</option>
+  <option>Wikivoyage</option>
+</select></p>
 
 {% endblock %}
 
