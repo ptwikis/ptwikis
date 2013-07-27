@@ -8,7 +8,8 @@ from datetime import date
 def template(page, arg):
     functions = {u'Usuário': EditsAndRights,
                  u'Patrulhamento_de_IPs': ippatrol,
-                 u'Filtros': filterActions}
+                 u'Filtros': filterActions,
+                 u'Editor_Visual': visualeditor}
     if page in functions:
         return functions[page](arg)
     else:
@@ -145,6 +146,26 @@ def filterActions(wiki=None):
         r = c.fetchall()
         r = [(int(f), t and t.decode('utf8') or u'', int(n), int(a), int(e), int(d)) for f, t, n, a, e, d in r]
         r = {'wiki': wiki, 'link': link(wiki), 'filters': r, 'max': max(map(max, [f[2:] for f in r]))}
+    else:
+        r = {}
+    return r
+
+def visualeditor(wiki=None):
+    if not wiki:
+        wiki = u'Wikipédia'
+    c = conn(wiki)
+    if c:
+        c.execute('''SELECT
+ SUBSTR(rc_timestamp, 1, 8) AS DIA,
+ COUNT(*)
+ FROM recentchanges
+ INNER JOIN tag_summary
+ ON rc_id = ts_rc_id
+ WHERE ts_tags = 'visualeditor'
+ GROUP BY DIA
+ ORDER BY rc_id DESC''')
+        r = c.fetchall()
+        r = {'wiki': wiki, 'link': link(wiki), 'VEquery': [map(int, l) for l in r]}
     else:
         r = {}
     return r

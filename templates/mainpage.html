@@ -40,5 +40,19 @@ grupos a que o usuário pertence e direito de se candidatar a administrador e el
   <option>Wikivoyage</option>
 </select></p>
 
+<h3 style="display: block; margin-top: 1em;"><a href="Editor_Visual">Editor Visual</a></h3>
+<p>Gráfico das edições usando o Editor Visual nos últios 30 dias.<br/>
+<select style="margin:1em auto 2em auto; border:1px solid #A7D7F9; background-color:#F6F6F6" onchange="location.href = location.href.substring(0, location.href.lastIndexOf('/')) + '/Editor_Visual:' + this.value">
+  <option value="">Escolha o projeto</option>
+  <option>Wikipédia</option>
+  <option>Wikilivros</option>
+  <option>Wikcionário</option>
+  <option>Wikiversidade</option>
+  <option>Wikinotícias</option>
+  <option>Wikiquote</option>
+  <option>Wikisource</option>
+  <option>Wikivoyage</option>
+</select></p>
+
 {% endblock %}
 
