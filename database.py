@@ -157,7 +157,8 @@ def visualeditor(wiki=None):
     if c:
         c.execute('''SELECT
  SUBSTR(rc_timestamp, 1, 8) AS DIA,
- COUNT(*)
+ COUNT(*),
+ SUM(CASE WHEN rc_user = 0 THEN 1 ELSE 0 END)
  FROM recentchanges
  INNER JOIN tag_summary
  ON rc_id = ts_rc_id

@@ -16,12 +16,16 @@
 
 var data = {
     veedits: [],
+    veusers: [],
+    veips: [],
     veraw: {{ VEquery|string }} };
 
 for (d in data.veraw.reverse()){
     var time = String(data.veraw[d][0]);
     time = Date.UTC(time.substr(0, 4), time.substr(4, 2), time.substr(6, 2))/1000;
-    data.veedits.push({x: time, y: data.veraw[d][1]})
+    data.veedits.push({x: time, y: data.veraw[d][1]});
+    data.veusers.push({x: time, y: data.veraw[d][1] - data.veraw[d][2]});
+    data.veips.push({x: time, y: data.veraw[d][2]});
 }
 
 var graph = new Rickshaw.Graph( {
@@ -32,7 +36,15 @@ var graph = new Rickshaw.Graph( {
     stroke: true,
     preserve: true,
     series: [{
-        name: "Edições com Editor Visula",
+        name: "Edições de IPs com Editor Visual",
+        data: data.veips,
+        color: '#CD2C49'
+    }, {
+        name: "Edições de registrados com Editor Visual",
+        data: data.veusers,
+        color: '#3176D0'
+    }, {
+        name: "Edições com Editor Visual",
         data: data.veedits,
         color: '#7B46B4'
     }]
