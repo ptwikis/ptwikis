@@ -82,6 +82,17 @@
         <td>{{ created_ptwikivoyage }}</td>
     </tr>
     <tr>
+        <th>Ficheiros carregados<sup><sub>*</sub></sup></th>
+        <td>{{ uploads_ptwiki }}</td>
+        <td>{{ uploads_ptwikibooks }}</td>
+        <td>{{ uploads_ptwiktionary }}</td>
+        <td>{{ uploads_ptwikinews }}</td>
+        <td>{{ uploads_ptwikiversity }}</td>
+        <td>{{ uploads_ptwikiquote }}</td>
+        <td>{{ uploads_ptwikisource }}</td>
+        <td>{{ uploads_ptwikivoyage }}</td>
+    </tr>
+    <tr>
         <th>Direito ao voto</th>
         <td>{{ vote_ptwiki |safe }}</td>
         <td>{{ vote_ptwikibooks |safe }}</td>
@@ -115,6 +126,55 @@
         <td>{{ others_ptwikivoyage |safe }}</td>
     </tr>
 </table>
+<br/>
+<h3>Projetos globais</h3>
+<table class="wikitable" style="margin-top:0">
+    <tr>
+        <td style="border:0; background-color:white"></td>
+        <th>
+<img src="//upload.wikimedia.org/wikipedia/commons/thumb/3/39/Commons-logo.png/50px-Commons-logo.png"/>
+<br/><small><a href="//commons.wikimedia.org/wiki/Pagina_principal">Commons</a></small>
+        </th>
+        <th style="padding-left:1px; padding-right:1px">
+<img style="margin:10px 0 10px" src="//upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Wikidata-logo.svg/80px-Wikidata-logo.svg.png"/>
+<br/><small><a href="//pt.wikibooks.org/wiki/Página_principal">Wikidata</a></small>
+        </th>
+        <th>
+<img src="http://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Wikispecies-logo.png/50px-Wikispecies-logo.png"/>
+<br/><small><a href="//pt.wiktionary.org/wiki/Página_principal">Wikispecies</a></small>
+        </th>
+    </tr>
+    <tr>
+        <th>Primeira edição</th>
+        <td>{{ time_commonswiki |safe }}</td>
+        <td>{{ time_wikidatawiki |safe }}</td>
+        <td>{{ time_specieswiki |safe }}</td>
+    </tr>
+    <tr>
+        <th>Edições totais</th>
+        <td><a href="//commons.wikimedia.org/wiki/Special:Contributions/{{user|replace(" ", "_")}}">{{ total_commonswiki }}</a></td>
+        <td><a href="//www.wikidata.org/wiki/Special:Contributions/{{user|replace(" ", "_")}}">{{ total_wikidatawiki }}</a></td>
+        <td><a href="//species.wikimedia.org/wiki/Special:Contributions/{{user|replace(" ", "_")}}">{{ total_specieswiki }}</a></td>
+    </tr>
+    <tr>
+        <th>Edições no domínio principal</th>
+        <td>{{ main_commonswiki }}</td>
+        <td>{{ main_wikidatawiki }}</td>
+        <td>{{ main_specieswiki }}</td>
+    </tr>
+    <tr>
+        <th>Páginas criadas no domínio principal</th>
+        <td>{{ created_commonswiki }}</td>
+        <td>{{ created_wikidatawiki }}</td>
+        <td>{{ created_specieswiki }}</td>
+    </tr>
+    <tr>
+        <th>Ficheiros carregados<sup><sub>*</sub></sup></th>
+        <td>{{ uploads_commonswiki }}</td>
+        <td>{{ uploads_wikidatawiki }}</td>
+        <td>{{ uploads_specieswiki }}</td>
+</table>
+<p style="font-size:80%">* Por motivos técnicos, só são contados os carregamentos que são a versão atual do ficheiro.</p>
 <br/>
 <table style="margin: 4em auto 15em auto;">
   <tr>

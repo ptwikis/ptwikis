@@ -9,7 +9,8 @@ def template(page, arg):
     functions = {u'Usuário': EditsAndRights,
                  u'Patrulhamento_de_IPs': ippatrol,
                  u'Filtros': filterActions,
-                 u'Editor_Visual': visualeditor}
+                 u'Editor_Visual': visualeditor,
+		 u'Interface_Movel': interfacemovel}
     if page in functions:
         return functions[page](arg)
     else:
@@ -43,9 +44,13 @@ def EditsAndRights(user):
                'ptwikinews': (30, 50),
                'ptwikiquote': (30, 100),
                'ptwikisource': (45, 100),
-               'ptwikivoyage': None}
+               'ptwikivoyage': None,
+               'commonswiki': None,
+               'wikidatawiki': None,
+               'specieswiki': None}
     groups = {'autoreviewer': 'autorrevisor', 'rollbacker': 'reversor', 'bureaucrat': 'burocrata', 'checkuser': 'verificador' ,'oversight': 'supervisor',
               'reviewer': 'revisor', 'import': 'importador'}
+    uploads = {'ptwiki': 0, 'commonswiki': 0}
     response = {}
     user = user.replace(u'_', u' ')
     for wiki in ptwikis:
@@ -66,11 +71,17 @@ def EditsAndRights(user):
  GROUP BY namespace''', (user,))
         r = c.fetchall()
         if not r:
-            response[wiki] = {'time': u'Nunca editou', 'total': u'0', 'main': u'0', 'created': u'0', 'vote': u'—', 'sysop': u'—', 'others': u'—'}
+            response[wiki] = {'time': u'Nunca editou', 'total': u'0', 'main': u'0', 'created': u'0', 'vote': u'—', 'sysop': u'—', 'others': u'—', 'uploads': u'0'}
             continue
         c.execute('SELECT ug_group FROM user LEFT JOIN user_groups ON user_id = ug_user WHERE user_name = ?', (user,))
         g = c.fetchall()
+        u = None
+        if wiki in uploads:
+            c.execute('SELECT COUNT(*) FROM image WHERE img_user_text = ?', (user,))
+            u = c.fetchall()
+
         g = g and [i in groups and groups[i] or i for i in map(lambda i:i[0], g) if i] or []
+        u = u and int(u[0][0]) or u'0'
         # Tempo desde a primeira edição
         t = len(r) == 2 and min(r[0][3], r[1][3]) or r[0][3]
         days = (date.today() - date(int(t[0:4]), int(t[4:6]), int(t[6:8]))).days
@@ -98,7 +109,7 @@ def EditsAndRights(user):
                 u'<span style="color:#800">Não pode candidatar-se a {}</span><br/><small>menos de {} dias{}</small>'.format(ptwikis[wiki][4], ptwikis[wiki][5],
                 total < ptwikis[wiki][1] and u' e de {} edições'.format(ptwikis[wiki][6]))) or None
         others = g and u'<br />'.join((others and [others] or []) + [u'<span style="color:#080"><b>É {}</b></span>'.format(i) for i in g if i != 'sysop']) or others or u'—'
-        response[wiki] = {'time': wikitime, 'total': str(total), 'main': str(main), 'created': str(created), 'vote': vote, 'sysop': sysop, 'others': others}
+        response[wiki] = {'time': wikitime, 'total': str(total), 'main': str(main), 'created': str(created), 'vote': vote, 'sysop': sysop, 'others': others, 'uploads': u}
     variables = dict([('{}_{}'.format(item, wiki), response[wiki][item])for wiki in response for item in response[wiki]])
     variables['user'] = user
     return variables
@@ -167,6 +178,27 @@ def visualeditor(wiki=None):
  ORDER BY rc_id DESC''')
         r = c.fetchall()
         r = {'wiki': wiki, 'link': link(wiki), 'VEquery': [map(int, l) for l in r]}
+    else:
+        r = {}
+    return r
+
+def interfacemovel(wiki=None):
+    if not wiki:
+        wiki = u'Wikipédia'
+    c = conn(wiki)
+    if c:
+        c.execute('''SELECT
+ SUBSTR(rc_timestamp, 1, 8) AS DIA,
+ COUNT(*),
+ SUM(CASE WHEN rc_user = 0 THEN 1 ELSE 0 END)
+ FROM recentchanges
+ INNER JOIN tag_summary
+ ON rc_id = ts_rc_id
+ WHERE ts_tags = 'mobile edit'
+ GROUP BY DIA
+ ORDER BY rc_id DESC''')
+        r = c.fetchall()
+        r = {'wiki': wiki, 'link': link(wiki), 'IMquery': [map(int, l) for l in r]}
     else:
         r = {}
     return r
