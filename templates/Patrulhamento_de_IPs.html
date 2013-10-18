@@ -17,6 +17,7 @@
 var data = {
     iph: [],
     iphpatrol: [],
+    iphpatrolratio: [],
     iphraw: [
 {{ iphquery }}
 ]};
@@ -26,6 +27,7 @@ for (d in data.iphraw.reverse()){
     time = Date.UTC(time.substr(0, 4), time.substr(4, 2), time.substr(6, 2), time.substr(8, 2))/1000;
     data.iph.push({x: time, y: data.iphraw[d][1]});
     data.iphpatrol.push({x: time, y: data.iphraw[d][2]});
+    data.iphpatrolratio.push({x: time, y: Math.round(100*data.iphraw[d][2] / data.iphraw[d][1] * 10) / 10});
 }
 
 var graph = new Rickshaw.Graph( {
@@ -43,7 +45,10 @@ var graph = new Rickshaw.Graph( {
         name: "Edições de IPs patrulhadas",
         data: data.iphpatrol,
         color: '#4B4'
-    }]
+    }, {
+        name: "Percentual de edições de IPs patrulhadas",
+        data: data.iphpatrolratio,
+	color: '#47B'}]
 });
 
 var x_axis = new Rickshaw.Graph.Axis.Time({
