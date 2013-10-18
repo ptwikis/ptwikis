@@ -1,4 +1,8 @@
 # -*- coding: utf-8  -*-
+
+import cgitb
+cgitb.enable()
+
 from flask import Flask, url_for, render_template, request
 from urllib import quote
 import re, os
