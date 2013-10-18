@@ -1,8 +1,10 @@
+#! /usr/bin/python
 # -*- coding: utf-8  -*-
 """
 Script para consultas ao banco de dados
 """
-import os, oursql
+import os
+import oursql
 from datetime import date
 
 def template(page, arg):
@@ -10,18 +12,22 @@ def template(page, arg):
                  u'Patrulhamento_de_IPs': ippatrol,
                  u'Filtros': filterActions,
                  u'Editor_Visual': visualeditor,
-		 u'Interface_Movel': interfacemovel}
+		 u'Interface_Movel': interfacemovel,
+		 u'Acessos':acessos}
     if page in functions:
         return functions[page](arg)
     else:
         return {}
 
-def conn(wiki):
+def conn(db, host=None):
     wikis = {u'Wikipédia': 'ptwiki', u'Wikilivros': 'ptwikibooks', u'Wikiversidade': 'ptwikiversity', u'Wikcionário': 'ptwiktionary', u'Wikinotícias': 'ptwikinews',
              u'Wikiquote': 'ptwikiquote', u'Wikisource': 'ptwikisource', u'Wikivoyage': 'ptwikivoyage'}
-    wiki = wiki in wikis and wikis[wiki] or wiki
     try:
-        connection = oursql.connect(db=wiki + '_p', host=wiki + '.labsdb', read_default_file=os.path.expanduser('~/replica.my.cnf'))
+	if host:
+	    connection = oursql.connect(db=db, host=host, read_default_file=os.path.expanduser('~/replica.my.cnf'))
+        else:
+	    db = db in wikis and wikis[db] or db
+            connection = oursql.connect(db=db + '_p', host=db + '.labsdb', read_default_file=os.path.expanduser('~/replica.my.cnf'))
         return connection.cursor()
     except:
         return False
@@ -201,4 +207,18 @@ def interfacemovel(wiki=None):
         r = {'wiki': wiki, 'link': link(wiki), 'IMquery': [map(int, l) for l in r]}
     else:
         r = {}
+    return r
+
+
+
+def acessos(wiki=None):
+    if not wiki:
+	    wiki = 'wp'
+    c = conn('p50380g50592_projects_access', 'tools-db')
+    if c:
+	    c.execute('''select left(datetime,8),sum(access) from hourly_access_p where language_short_name="pt" and project_short_name="wp" group by left(datetime,8) ''')
+            r = c.fetchall()
+            r = {'wiki': wiki, 'link': link(wiki), 'PAquery': [map(int, l) for l in r]}
+    else:
+	    r = {}
     return r

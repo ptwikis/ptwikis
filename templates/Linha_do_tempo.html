@@ -1,110 +1,75 @@
 {% extends "base.html" %}
 {% block head %}
-	<link rel="stylesheet" href="{{ url_for('static', filename='rickshaw/rickshaw.min.css') }}">
-	<script src="{{ url_for('static', filename='rickshaw/vendor/d3.v2.js') }}"></script>
-	<script src="{{ url_for('static', filename='rickshaw/vendor/d3.layout.min.js') }}"></script>
-	<script src="{{ url_for('static', filename='rickshaw/rickshaw.min.js') }}"></script>
-	<script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Graph.Annotate.js') }}"></script>
 
-	<style>
-		.break{
-		    border-bottom: 2px dashed gray;
-		    height: 100px;
-		    width: auto;
-		}
+  <title>WikiTimeline</title>
+  
+  <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='timeline/ui/jquery-ui.css') }}">
+  <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='timeline/src/css/graph.css') }}">
+  <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='timeline/src/css/detail.css') }}">
+  <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='timeline/src/css/legend.css') }}">
+  <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='timeline/src/css/estilo.css') }}">
 
-		#chart {
-			text-align: center;
-		}
+  <script src="{{ url_for('static', filename='timeline/src/js/jquery/jquery.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='timeline/src/js/jquery/jquery-ui.min.js') }}"></script>
 
-		#legend {
-	        display: inline-block;
-	        vertical-align: top;
-	        margin: 0 0 0 10px;
-	        box-shadow: 0 0 1em;
-		}
-		svg {
-			box-shadow: 0 0 1em;
-		}
+  <script src="{{ url_for('static', filename='timeline/src/js/d3/d3.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/rickshaw.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Class.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Compat.ClassList.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Graph.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Graph.Renderer.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Graph.Renderer.Area.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Graph.Renderer.Line.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Graph.Renderer.Bar.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Graph.Renderer.ScatterPlot.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Graph.RangeSlider.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Graph.HoverDetail.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Graph.Annotate.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Graph.Legend.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Graph.Axis.Time.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Graph.Behavior.Series.Toggle.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Graph.Behavior.Series.Order.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Graph.Behavior.Series.Highlight.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Graph.Smoother.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Graph.Unstacker.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Fixtures.Time.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Fixtures.Number.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Fixtures.Color.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Fixtures.RandomData.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Color.Palette.js') }}"></script>
+  <script src="{{ url_for('static', filename='rickshaw/src/js/Rickshaw.Graph.Axis.Y.js') }}"></script>
 
-	</style>
 {% endblock %}
+
 {% block content %}
-	    <p>Alpha</p>
+  <div id="content_timeline">
+    <div id="chart_container">
+      <div id="chart"></div>
+      <div id="timeline"></div>
+      <div id="slider"></div>
+    </div>
+    <div id="panel">
+      <div id="legend" class="section"></div>
+      <div id="panel" class="section">
+	<form id="panel" name="events_selector">
+	  Geral: <input type="radio" name="evento" value="geral" onClick="switch_events(this.value)"> <br/>
+	  Vandalismo: <input type="radio" name="evento" checked="" value="vandalismo" onClick="switch_events(this.value)"> <br/>	
+	  Estatutos: <input type="radio" name="evento" value="estatuto" onClick="switch_events(this.value)"> <br/>
+	  Construção de artigos: <input type="radio" name="evento" value="construcao" onClick="switch_events(this.value)"> <br/>
+	  Comunidade: <input type="radio" name="evento" value="comunidade" onClick="switch_events(this.value)"> <br/>
+	</form>
+      </div>
+      <div id="about" class="section">
+	<p>A Linha do Tempo é uma visualização que combina os eventos da wikipédia e seus dados. Os eventos estão na página <a href="https://pt.wikipedia.org/wiki/Wikip%C3%A9dia:Arqueologia/Linha_do_tempo">Wikipédia:Arqueologia/Linha do tempo</a> e foram listados por voluntários com o objetivo de estudar acontecimentos relevantes para a enciclopédia livre. 
+      </div>
+    </div>
+  </div>
 
-<div id="chart"></div>
-<div id="legend"></div>
-<div id="timeline"></div>
-
-<script>
-
-	data = new Array();
-
-	var palette = new Rickshaw.Color.Palette( { scheme: 'cool' } );
-
-	var parseDate = d3.time.format("%Y%m%d").parse;
-
-	var graph = new Rickshaw.Graph( {
-		element: document.getElementById("chart"),
-		width: 800,
-		height: 300,
-		renderer: 'line',
-		stroke: true,
-		preserve: true,
-		series: [
-			{
-			name: "Jaca",
-			data: [ { x: -1893456000, y: 25868573 }, { x: -1577923200, y: 29662053 }, { x: -1262304000, y: 34427091 }, { x: -946771200, y: 35976777 }, { x: -631152000, y: 39477986 }, { x: -315619200, y: 44677819 }, { x: 0, y: 49040703 }, { x: 315532800, y: 49135283 }, { x: 631152000, y: 50809229 }, { x: 946684800, y: 53594378 }, { x: 1262304000, y: 55317240 } ],
-			color: palette.color()
-		},
-		{
-			name: "Melancia",
-			data: [ { x: -1893456000, y: 29888542 }, { x: -1577923200, y: 34019792 }, { x: -1262304000, y: 38594100 }, { x: -946771200, y: 40143332 }, { x: -631152000, y: 44460762 }, { x: -315619200, y: 51619139 }, { x: 0, y: 56571663 }, { x: 315532800, y: 58865670 }, { x: 631152000, y: 59668632 }, { x: 946684800, y: 64392776 }, { x: 1262304000, y: 66927001 } ],
-			color: palette.color()
-		},
-		{
-			name: "Maça",
-			data: [ { x: -1893456000, y: 29389330 }, { x: -1577923200, y: 33125803 }, { x: -1262304000, y: 37857633 }, { x: -946771200, y: 41665901 }, { x: -631152000, y: 47197088 }, { x: -315619200, y: 54973113 }, { x: 0, y: 62795367 }, { x: 315532800, y: 75372362 }, { x: 631152000, y: 85445930 }, { x: 946684800, y: 100236820 }, { x: 1262304000, y: 114555744 } ],
-			color: palette.color()
-		},
-		{
-			name: "Pera",
-			data: [ { x: -1893456000, y: 7082086 }, { x: -1577923200, y: 9213920 }, { x: -1262304000, y: 12323836 }, { x: -946771200, y: 14379119 }, { x: -631152000, y: 20189962 }, { x: -315619200, y: 28053104 }, { x: 0, y: 34804193 }, { x: 315532800, y: 43172490 }, { x: 631152000, y: 52786082 }, { x: 946684800, y: 63197932 }, { x: 1262304000, y: 71945553 } ],
-			color: palette.color()
-		}]
-	});
-
-	var x_axis = new Rickshaw.Graph.Axis.Time( { graph: graph } );
-/*
-	var legend = new Rickshaw.Graph.Legend( {
-        element: document.querySelector('#legend'),
-        graph: graph
-	});
-*/
-	var messages = [
-		"Pouca chuva", "Mais chuva", "Muita chuva"
-	];
-
-	var annotator = new Rickshaw.Graph.Annotate( {
-		graph: graph,
-		element: document.getElementById('timeline')
-	});
-
-/*	var shelving = new Rickshaw.Graph.Behavior.Series.Toggle( {
-		graph: graph,
-		legend: legend
-	});
-*/
-	annotator.add(-1262304000, messages.shift());
-	annotator.add(946684800, messages.shift());
-	annotator.add(315532800, messages.shift());
-
-
-	graph.render();
-
-	var hoverDetail = new Rickshaw.Graph.HoverDetail( {
-		graph: graph
-	});
-
+<!-- The source code goes here: -->
+<script src="{{ url_for('static', filename='timeline/src/js/main.js') }}">
+//data_render( "{{ url_for('static', filename='timeline/data/wiki_data.tsv') }}" );
+//events_render( "{{ url_for('static', filename='timeline/data/events.json') }}" );
 </script>
+
 {% endblock %}
