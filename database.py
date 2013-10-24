@@ -68,7 +68,7 @@ def EditsAndRights(user):
         c.execute('''SELECT
  (CASE page_namespace WHEN 0 THEN "main" ELSE "others" END) AS namespace,
  COUNT(*),
- SUM(page_is_new),
+ SUM(CASE WHEN rev_parent_id = 0 THEN 1 ELSE 0 END),
  MIN(rev_timestamp)
  FROM revision_userindex
  FULL JOIN page
