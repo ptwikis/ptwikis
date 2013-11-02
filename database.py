@@ -127,15 +127,28 @@ def ippatrol(wiki=None):
     if c:
         c.execute('''SELECT
  SUBSTR(rc_timestamp, 1, 10) AS HORA,
- COUNT(*),
- SUM(rc_patrolled)
+ SUM(CASE WHEN rc_user = 0 THEN 1 ELSE 0 END),
+ SUM(CASE WHEN rc_user = 0 THEN rc_patrolled ELSE 0 END),
+ SUM(CASE WHEN rc_comment LIKE ? OR rc_comment LIKE ? THEN 1 ELSE 0 END)
  FROM recentchanges
- WHERE rc_namespace = 0 AND rc_user = 0 AND rc_type != 5
+ WHERE rc_namespace = 0 AND rc_type != 5
  GROUP BY HORA
  ORDER BY rc_id DESC
- LIMIT 168''')
-        r = c.fetchall()
-        r = {'wiki': wiki, 'link': link(wiki), 'iphquery': ','.join([(x in r[6::6] and '\n[{},{},{}]' or '[{},{},{}]').format(*x) for x in r])}
+ LIMIT 168''', ('[[WP:REV|%', u'Reversão de uma ou mais edições de%'))
+        r1 = c.fetchall()
+        c.execute('''SELECT
+ SUBSTR(rc_timestamp, 1, 8) AS DIA,
+ SUM(CASE WHEN rc_user = 0 THEN 1 ELSE 0 END),
+ SUM(CASE WHEN rc_user = 0 THEN rc_patrolled ELSE 0 END),
+ SUM(CASE WHEN rc_comment LIKE ? OR rc_comment LIKE ? THEN 1 ELSE 0 END)
+ FROM recentchanges
+ WHERE rc_namespace = 0 AND rc_type != 5
+ GROUP BY DIA
+ ORDER BY rc_id DESC''', ('[[WP:REV|%', u'Reversão de uma ou mais edições de%'))
+        r2 = c.fetchall()
+        r = {'wiki': wiki, 'link': link(wiki)}
+	r['iphquery'] = ','.join([(x in r1[6::6] and '\n[{},{},{},{}]' or '[{},{},{},{}]').format(*x) for x in r1])
+	r['ipdquery'] = ','.join([(x in r2[6::6] and '\n[{},{},{},{}]' or '[{},{},{},{}]').format(*x) for x in r2][1:-1])
     else:
         r = {}
     return r
