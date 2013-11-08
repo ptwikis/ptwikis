@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<p>Lista dos menores artigos da Wikipédia, desconsiderando as desambigações.</p>
+<ol>
+{%- for titulo, tamanho in lista %}
+<li> <a href="https://{{ link }}.org/wiki/{{ titulo }}">{{ titulo|replace("_", " ") }}</a> [{{ tamanho }} bytes]
+{%- endfor %}
+</ol>
+{% endblock %}

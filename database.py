@@ -13,7 +13,8 @@ def template(page, arg):
                  u'Filtros': filterActions,
                  u'Editor_Visual': visualeditor,
 		 u'Interface_Movel': interfacemovel,
-		 u'Acessos':acessos}
+		 u'Acessos': acessos,
+		 u'Artigos_curtos': shortpages}
     if page in functions:
         return functions[page](arg)
     else:
@@ -235,3 +236,27 @@ def acessos(wiki=None):
     else:
 	    r = {}
     return r
+
+def shortpages(wiki=None):
+    if not wiki:
+        wiki = u'Wikipédia'
+    c = conn(wiki)
+    if c:
+        c.execute('''SELECT
+ page_title,
+ page_len
+ FROM page
+ WHERE page_namespace = 0 AND page_is_redirect = 0 AND page_id NOT IN (
+  SELECT
+   cl_from
+   FROM categorylinks
+   WHERE cl_to = 'Desambiguação'
+ ) AND page_len < 800
+ ORDER BY page_len
+ LIMIT 100;''')
+        r = c.fetchall()
+        r = {'wiki': wiki, 'link': link(wiki), 'lista': [(l[0].decode('utf-8'), int(l[1])) for l in r]}
+    else:
+        r = {}
+    return r
+
