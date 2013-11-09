@@ -33,6 +33,19 @@ def conn(db, host=None):
     except:
         return False
 
+def query(query, db='ptwiki', host=None, limit=200):
+    corr = lambda i: type(i) == str and i.decode('utf-8') or type(i) == long and int(i) or i
+    c = conn(db, host)
+    if not c:
+        print u'# Não foi possível conectar ao BD ' + db
+        return False
+    c.execute(query)
+    r = c.fetchmany(limit)
+    r = [tuple(corr(item) for item in linha) for linha in r]
+    if len(r[0]) == 1:
+        r = [l[0] for l in r]
+    return r
+
 def link(wiki):
     wikis = {u'Wikipédia': 'pt.wikipedia', u'Wikilivros': 'pt.wikibooks', u'Wikiversidade': 'pt.wikiversity', u'Wikcionário': 'pt.wiktionary', u'Wikinotícias': 'pt.wikinews',
              u'Wikiquote': 'pt.wikiquote', u'Wikisource': 'pt.wikisource', u'Wikivoyage': 'pt.wikivoyage'}
@@ -240,23 +253,35 @@ def acessos(wiki=None):
 def shortpages(wiki=None):
     if not wiki:
         wiki = u'Wikipédia'
-    c = conn(wiki)
-    if c:
-        c.execute('''SELECT
+    r = query(u"""SELECT
  page_title,
- page_len
- FROM page
- WHERE page_namespace = 0 AND page_is_redirect = 0 AND page_id NOT IN (
+ page_len,
+ rev_timestamp,
+ rev_user_text,
+ cl_to
+ FROM (
   SELECT
-   cl_from
-   FROM categorylinks
-   WHERE cl_to = 'Desambiguação'
- ) AND page_len < 800
- ORDER BY page_len
- LIMIT 100;''')
-        r = c.fetchall()
-        r = {'wiki': wiki, 'link': link(wiki), 'lista': [(l[0].decode('utf-8'), int(l[1])) for l in r]}
+   page_id,
+   page_latest,
+   page_title,
+   page_len
+   FROM page
+   WHERE page_namespace = 0 AND page_is_redirect = 0 AND page_id NOT IN (
+    SELECT
+     cl_from
+     FROM categorylinks
+     WHERE cl_to = 'Desambiguação'
+   )
+   AND page_len < 800
+   ORDER BY page_len
+   LIMIT 100
+ ) p
+ LEFT JOIN revision ON page_latest = rev_id
+ LEFT JOIN categorylinks ON page_id = cl_from AND cl_to NOT LIKE '!%'
+ GROUP BY page_title""", wiki)
+    if r:
+        resp = {'wiki': wiki, 'link': link(wiki), 'lista': r}
     else:
-        r = {}
-    return r
+        resp = {}
+    return resp
 

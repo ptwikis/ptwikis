@@ -1,9 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
 <p>Lista dos menores artigos da Wikipédia, desconsiderando as desambigações.</p>
-<ol>
-{%- for titulo, tamanho in lista %}
-<li> <a href="https://{{ link }}.org/wiki/{{ titulo }}">{{ titulo|replace("_", " ") }}</a> [{{ tamanho }} bytes]
+<table class="wikitable">
+	<tr><th rowspan=2>Artigo</th><th rowspan=2>Tamanho</th><th colspan=2>Última edição</th><th rowspan=2>Categoria</th></tr>
+  <tr><th>Data</th><th>Usuário</th></tr>
+{%- for page, size, ts, user, cat in lista %}
+  <tr>
+    <td><a href="https://{{ link }}.org/wiki/{{ page }}">{{ page|replace("_", " ") }}</a></td>
+    <td>{{ size }} bytes</td>
+    <td>{{ "%s.%s.%s"|format(ts[6:8], ts[4:6], ts[2:4]) }}</td>
+    <td><a href="https://{{ link }}.org/wiki/User:{{ user }}">{{ user|replace("_", " ") }}</a>
+        (<a href="https://{{ link }}.org/wiki/User_Talk:{{ user }}">D</a> <a href="https://{{ link }}.org/wiki/Special:Contribs/{{ user }}">C</a>)</td>
+<td>{% if cat != None %}<a href="https://{{ link }}.org/wiki/Category:{{ cat }}">{{ cat|replace("_", " ") }}</td>{% endif %}
+  </tr>
 {%- endfor %}
-</ol>
+</table>
 {% endblock %}
