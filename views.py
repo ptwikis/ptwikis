@@ -6,7 +6,6 @@ cgitb.enable()
 from flask import Flask, url_for, render_template, request
 from urllib import quote
 import re, os
-import database
 
 app = Flask(__name__)
 
@@ -18,7 +17,15 @@ def index(page=None):
 def htmlpage(page=None):
     page = page.split(':', 1)
     html = (page[0] + u'.html').encode('utf8')
-    if html in os.listdir(app.root_path + '/templates'):
+    if page[0] + '.py' in os.listdir(app.root_path + '/tools'):
+      filename = app.root_path + '/tools/' + page[0] + '.py'
+      with open(filename, 'r') as f:
+        source = f.read()
+      tool = {}
+      exec compile(source, filename, 'exec') in tool
+      return len(page) == 1 and tool['main']() or tool['main'](page[1])
+    elif html in os.listdir(app.root_path + '/templates'):
+        import database #Depois que colocar as ferramentas que usam bd na pasta tools, não será mais necessácio chamar o database.py
         return render_template(html, title=u':'.join(page).replace(u'_', u' '), **database.template(page[0], arg=len(page) > 1 and page[1] or None))
     else:
         return page_not_found(404)
