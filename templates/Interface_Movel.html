@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='rickshaw/rickshaw.min.css') }}">
+<script src="{{ url_for('static', filename='rickshaw/vendor/d3.min.js') }}"></script>
+<script src="{{ url_for('static', filename='rickshaw/rickshaw.min.js') }}"></script>
+
+<style> svg {box-shadow: 0 0 3px} </style>
+{% endblock %}
+{% block content %}
+<p style="font-size:small">O gráfico a seguir se refere às edições feitas usando a Interface Móvel  
+{% if wiki == "Wikipédia" %}na{% else %}no{% endif %} {{ wiki }} nos últimos 30 dias.</p>
+{% if IMquery %}
+<div id="chart"></div>
+
+<script>
+
+var data = {
+    imedits: [],
+    imusers: [],
+    imips: [],
+    imraw: {{ IMquery|string }} };
+
+for (d in data.imraw.reverse()){
+    var time = String(data.imraw[d][0]);
+    time = Date.UTC(time.substr(0, 4), time.substr(4, 2) - 1, time.substr(6, 2))/1000;
+    data.imedits.push({x: time, y: data.imraw[d][1]});
+    data.imusers.push({x: time, y: data.imraw[d][1] - data.imraw[d][2]});
+    data.imips.push({x: time, y: data.imraw[d][2]});
+}
+
+var graph = new Rickshaw.Graph( {
+    element: document.getElementById("chart"),
+    width: 800,
+    height: 300,
+    renderer: 'line',
+    stroke: true,
+    preserve: true,
+    series: [{
+        name: "Edições de IPs com Interface Móvel",
+        data: data.imips,
+        color: '#CD2C49'
+    }, {
+        name: "Edições de registrados com Interface Móvel",
+        data: data.imusers,
+        color: '#3176D0'
+    }, {
+        name: "Edições com Interface Móvel",
+        data: data.imedits,
+        color: '#7B46B4'
+    }]
+});
+
+var x_axis = new Rickshaw.Graph.Axis.Time({
+    graph: graph,
+    timeUnit: {
+        seconds: 86400*4,
+        formatter: function(d){return d.getUTCDate() + ' ' + ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','set'][d.getUTCMonth()]}
+    },
+});
+
+graph.render();
+
+var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+    graph: graph,
+    xFormatter: function(x){
+        var d = new Date(x * 1000);
+        var dia = String(d.getUTCDate());
+        return 'dia ' + dia
+    },
+    yFormatter: function(y){return y}
+});
+</script>
+{%- else %}
+<span style="color:red"><b>Erro</b></span>
+{%- endif %}
+{% endblock %}

@@ -26,7 +26,8 @@ function enter(e, textinput, prefix) {
 		<div id="menu">
 <img src="//upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Tool_labs_logo.svg/120px-Tool_labs_logo.svg.png">
                 <div id="menu-content">
-<div id="menu-item"><a href="./">Ferramentas</a></div>
+<div id="menu-item">{% if title == 'Ferramentas para projetos lusófonos'%}<b>Ferramentas</b>{% else %}<a href="./">Ferramentas</a>{% endif %}</div>
+<div id="menu-item"><a href="./Tools">Ferramentas globais</a></div>
 <div id="menu-item"><a href="//pt.wikipedia.org/wiki/Wikip%C3%A9dia:Ptwikis">Coordenação</a></div>
                 </div>
             </div>

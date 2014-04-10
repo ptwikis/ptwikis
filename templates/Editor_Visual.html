@@ -22,7 +22,7 @@ var data = {
 
 for (d in data.veraw.reverse()){
     var time = String(data.veraw[d][0]);
-    time = Date.UTC(time.substr(0, 4), time.substr(4, 2), time.substr(6, 2))/1000;
+    time = Date.UTC(time.substr(0, 4), time.substr(4, 2)-1, time.substr(6, 2))/1000;
     data.veedits.push({x: time, y: data.veraw[d][1]});
     data.veusers.push({x: time, y: data.veraw[d][1] - data.veraw[d][2]});
     data.veips.push({x: time, y: data.veraw[d][2]});
@@ -54,7 +54,7 @@ var x_axis = new Rickshaw.Graph.Axis.Time({
     graph: graph,
     timeUnit: {
         seconds: 86400*4,
-        formatter: function(d){return d.getUTCDate() + ' ' + ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','set'][d.getUTCMonth() - 1]}
+        formatter: function(d){return d.getUTCDate() + ' ' + ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][d.getUTCMonth()]}
     },
 });
 

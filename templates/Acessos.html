@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='rickshaw/rickshaw.min.css') }}">
+<script src="{{ url_for('static', filename='rickshaw/vendor/d3.min.js') }}"></script>
+<script src="{{ url_for('static', filename='rickshaw/rickshaw.min.js') }}"></script>
+
+<style> svg {box-shadow: 0 0 3px} </style>
+{% endblock %}
+{% block content %}
+<p style="font-size:small">O gráfico a seguir se refere aos acessos feitos a Wikipédia em Português.</p>
+{% if PAquery %}
+
+<style>
+#chart_container {
+        position: relative;
+        font-family: Arial, Helvetica, sans-serif;
+}
+#chart {
+        position: relative;
+        left: 40px;
+}
+#y_axist {
+        position: absolute;
+        width: 40px;
+	border: 0;
+	border-style: 0;
+}
+</style>
+
+<div id="chart_container">
+<div id="y_axist"></div>
+<div id="chart"></div>
+</div>
+
+
+<script>
+
+var data = {
+    acedits: [],
+    acraw: {{ PAquery|string }} };
+
+for (d in data.acraw){
+    var time = String(data.acraw[d][0]);
+    var time2 =  new Date(time.substr(0, 4), time.substr(4, 2), time.substr(6, 2)).getTime()/1000;
+    data.acedits.push({x: time2, y: data.acraw[d][1]});
+}
+
+var graph = new Rickshaw.Graph( {
+    element: document.getElementById("chart"),
+    width: 800,
+    height: 300,
+    renderer: 'line',
+    stroke: true,
+    preserve: true,
+    series: [{
+        name: "Acessos",
+        data: data.acedits,
+        color: '#7B46B4'
+    }]
+});
+
+var x_axis = new Rickshaw.Graph.Axis.Time({
+    graph: graph,
+});
+
+
+var y_axis = new Rickshaw.Graph.Axis.Y( {
+        graph: graph,
+        orientation: 'left',
+        tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+        element: document.getElementById('y_axist'),
+} );
+
+graph.render();
+
+var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+    graph: graph,
+    xFormatter: function(x){
+        var d = new Date(x * 1000);
+        return String(d.getUTCDate()) + '/' + String(d.getUTCMonth()) + '/' + String(d.getUTCFullYear())
+    },
+    yFormatter: function(y){return y}
+});
+</script>
+{%- else %}
+<span style="color:red"><b>Erro</b></span>
+{%- endif %}
+{% endblock %}
+

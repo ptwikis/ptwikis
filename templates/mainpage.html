@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
 
-Este é um projeto desenvolvido no Tool Labs para os projetos lusófonos.
+<p>Este é um projeto desenvolvido de forma colaborativa entre usuários lusófonos.
+<br/>This is a project developed in collaboration between Portuguese Wikimedia projects users.</p>
 <h3 style="display: block; margin-top: 1em;">Edições e grupos de usuário</h3>
 <p>Exibe para um determidado usuário o número de edições totais e no domínio principal, número de páginas criadas no domínio principal, direito a voto, 
 grupos a que o usuário pertence e direito de se candidatar a administrador e eliminador.</p>
@@ -13,8 +14,8 @@ grupos a que o usuário pertence e direito de se candidatar a administrador e el
 </table>
 
 <h3 style="display: block; margin-top: 1em;"><a href="Patrulhamento_de_IPs">Patrulhamento de IPs</a></h3>
-<p>Gráfico das edições de IPs e edições de IPs patrulhadas por hora nos últimos 7 dias.<br/>
-<select style="margin:1em auto 2em auto; border:1px solid #A7D7F9; background-color:#F6F6F6" onchange="location.href = location.href.substring(0, location.href.lastIndexOf('/')) + '/Patrulhamento_de_IPs:' + this.value">
+<p>Gráfico das edições de IPs e edições de IPs patrulhadas por hora nos últimos 7 dias, e por dia nos últimos 30 dias.<br/>
+<select style="margin-top:1em; border:1px solid #A7D7F9; background-color:#F6F6F6" onchange="location.href = location.href.substring(0, location.href.lastIndexOf('/')) + '/Patrulhamento_de_IPs:' + this.value">
   <option value="">Escolha o projeto</option>
   <option>Wikipédia</option>
   <option>Wikilivros</option>
@@ -28,7 +29,7 @@ grupos a que o usuário pertence e direito de se candidatar a administrador e el
 
 <h3 style="display: block; margin-top: 1em;"><a href="Filtros">Filtros</a></h3>
 <p>Gráfico dos registros de ações dos filtros nos últimos 30 dias.<br/>
-<select style="margin:1em auto 2em auto; border:1px solid #A7D7F9; background-color:#F6F6F6" onchange="location.href = location.href.substring(0, location.href.lastIndexOf('/')) + '/Filtros:' + this.value">
+<select style="margin-top:1em; border:1px solid #A7D7F9; background-color:#F6F6F6" onchange="location.href = location.href.substring(0, location.href.lastIndexOf('/')) + '/Filtros:' + this.value">
   <option value="">Escolha o projeto</option>
   <option>Wikipédia</option>
   <option>Wikilivros</option>
@@ -41,8 +42,8 @@ grupos a que o usuário pertence e direito de se candidatar a administrador e el
 </select></p>
 
 <h3 style="display: block; margin-top: 1em;"><a href="Editor_Visual">Editor Visual</a></h3>
-<p>Gráfico das edições usando o Editor Visual nos últios 30 dias.<br/>
-<select style="margin:1em auto 2em auto; border:1px solid #A7D7F9; background-color:#F6F6F6" onchange="location.href = location.href.substring(0, location.href.lastIndexOf('/')) + '/Editor_Visual:' + this.value">
+<p>Gráfico das edições usando o Editor Visual nos últimos 30 dias.<br/>
+<select style="margin-top:1em; border:1px solid #A7D7F9; background-color:#F6F6F6" onchange="location.href = location.href.substring(0, location.href.lastIndexOf('/')) + '/Editor_Visual:' + this.value">
   <option value="">Escolha o projeto</option>
   <option>Wikipédia</option>
   <option>Wikilivros</option>
@@ -54,5 +55,19 @@ grupos a que o usuário pertence e direito de se candidatar a administrador e el
   <option>Wikivoyage</option>
 </select></p>
 
+<h3 style="display: block; margin-top: 1em;"><a href="Linha_do_tempo">Linha do tempo</a></h3>
+<p>Gráfico com vários dados e eventos da Wikipédia.</p>
+
+<h3 style="display: block; margin-top: 1em;"><a href="Interface_Movel">Interface móvel</a></h3>
+<p>Gráfico das edições feitas na Wikipédia por interface móvel.</p>
+
+<h3 style="display: block; margin-top: 1em;">Acessos</h3>
+<p>Gráfico dos acessos à Wikipédia. <b>Em Manutenção</b></p>
+
+<h3 style="display: block; margin-top: 1em;"><a href="Artigos_curtos">Artigos curtos</a></h3>
+<p>Lista dos menores artigos da Wikipédia, sem contar as desambiguações</p>
+
+<h3 style="display: block; margin-top: 1em;"><a href="Listas">Listas</a></h3>
+<p>Lista de páginas utilizando diversos filtros</p>
 {% endblock %}
 

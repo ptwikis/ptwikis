@@ -2,7 +2,7 @@ body
 {
     background: #F6F6F6;
     margin: 0 0 0 0;
-    font-size: small;
+    font-size: 0.85em;
 }
 
 #content-wrapper
@@ -18,6 +18,7 @@ body
     width: 176px;
     height: 100%;
     text-align: center;
+    font-size: small;
     padding: 10px 2px 2px 2px;
 }
 
@@ -84,7 +85,14 @@ a:visited, a:active
 {
     color: #08008C; 
 }
-
+a.ext
+{
+    color: #36B;
+}
+a.ext:visited
+{
+    color: #636;
+}
 table.wikitable
 {
     margin: 1em 0;
@@ -103,4 +111,20 @@ table.wikitable td
     border: 1px #aaa solid;
     background-color: #F9F9F9;
     text-align: center;
+}
+ul
+{
+    padding-left: 0.5em;
+    list-style-type: none;
+}
+ul li
+{
+    background: url(https://upload.wikimedia.org/wikipedia/commons/9/90/Vector-bullet-icon.png) no-repeat 0% 0%;
+    padding:0 0 4px 14px;
+}
+select
+{
+    margin-top:1em;
+    border:1px solid #A7D7F9;
+    background-color:#F6F6F6;
 }

@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+	<title>{% block title %}{{ title }}{% endblock %}</title>
+
+        <link rel="icon" type="image/x-icon" href='static/Tool_labs_logo.ico'" />
+        <link rel="stylesheet" type="text/css" media="screen" href='static/style.css' "/>
+{% block head %}
+        <script>
+function enter(e, textinput, prefix) {
+    if (e.keyCode == 13) {
+	var value = textinput.value.replace(/ /g, "_");
+	location.href = location.href.substring(0, location.href.lastIndexOf("/") + 1) + prefix + value;
+        return false;
+    }
+}
+function wikichoose(){
+  var lang = document.getElementById('lang');
+  var wiki = document.getElementById('wiki').value;
+  if (wiki == 'metawiki' || wiki == 'commonswiki' || wiki == 'wikidatawiki') {
+    lang.value = '';
+    lang.disabled = true;
+  } else if (lang.disabled == true) {
+  lang.disabled = false;
+  }
+}
+function go(){
+  var lang = document.getElementById('lang').value;
+  var wiki = document.getElementById('wiki').value;
+  location.href = 'https://tools.wmflabs.org/ptwikis/Filters:' + lang + wiki;
+  return false;
+}
+        </script>
+{% endblock %}
+  </head>
+    <body>
+        <div id="content-wrapper">
+		<div id="menu">
+<img src="//upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Tool_labs_logo.svg/120px-Tool_labs_logo.svg.png">
+                <div id="menu-content">
+<div id="menu-item"><a href="./">Tools for Portuguese projects</a></div>
+<div id="menu-item">{% if title == 'Tools' %}<b>Global tools</b>{% else %}<a href="./Tools">Global tools</a>{% endif %}</div>
+<div id="menu-item"><a href="https://pt.wikipedia.org/wiki/Wikip%C3%A9dia:Ptwikis">Coordination</a></div>
+                </div>
+            </div>
+            <div id="content">
+<br/>
+<h1>{{ self.title() }}</h1>
+<hr/> Tool Labs – ptwikis <br/><br/>
+{% block content %}
+<p>This is a project developed in colaboration between Portuguese speaking users.</p>
+<br/>
+
+<h3 style="display: block; margin-top: 1em;"><a href="common-iw">Common interwiki articles</a></h3>
+<p>List of articles that exists in the English Wikipedia without interwiki to a determined language, ordered by existing interwikis.</p>
+<p>Language prefix: <input id="user" type="text" size=2 onkeypress="return enter(event, this, 'common-iw:')"/></p>
+
+<h3 style="display: block; margin-top: 1em;"><a href="Filters">Abuse Filter Graphs</a></h3>
+<p>Graphs of Abuse Filter actions.</p>
+<p>Choose a wiki: <input id="lang" type="text" size=2 onkeypress="return enter(event, this, 'Filters:')"/>
+<select id="wiki" style="margin-top:1em; border:1px solid #DDDDDD; background-color:#F6F6F6" onchange="wikichoose()">
+  <option value="wiki">Wikipedia</option>
+  <option value="wikibooks">Wikibooks</option>
+  <option value="wikitionary">Wikitionary</option>
+  <option value="wikiiversity">Wikiiversity</option>
+  <option value="wikiinews">Wikiinews</option>
+  <option value="wikiiquote">Wikiiquote</option>
+  <option value="wikiisource">Wikiisource</option>
+  <option value="wikiivoyage">Wikiivoyage</option>
+  <option value="metawiki">Meta-Wiki</option>
+  <option value="wikidatawiki">Wikidata</option>
+  <option value="commonswiki">Commons</option>
+</select>
+<input type="button" onclick="go()" value="Go"/></p>
+
+{% endblock %}
+            </div>
+       </div>
+       <div style="float: right; margin: 10px 8px; font-size:x-small">
+Made with <a href="http://flask.pocoo.org/">Flask</a>
+       </div>
+       <div style="text-align:center; font-size:x-small; margin: 10px 10px 12px 181px">
+The <a href="https://bitbucket.org/danilomac/ptwikis/src">source</a> of this page is available under GNU General Public License 3.0 (GPL V3).
+       </div>
+    </body>
+</html>
+
+ 

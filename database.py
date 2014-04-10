@@ -7,6 +7,34 @@ import os
 import oursql
 from datetime import date
 
+ns = {1: u'Discussão:',
+      3: u'Usuário(a) Discussão:',
+      2: u'Usuário(a):',
+      5: u'Wikipédia Discussão:',
+      4: u'Wikipédia:',
+      7: u'Ficheiro Discussão:',
+      6: u'Ficheiro:',
+      9: u'MediaWiki Discussão:',
+      8: u'MediaWiki:',
+      447: u'Ensino Discussão:',
+      446: u'Ensino:',
+      711: u'TimedText talk:',
+      710: u'TimedText:',
+      102: u'Anexo:',
+      103: u'Anexo Discussão:',
+      100: u'Portal:',
+      101: u'Portal Discussão:',
+      104: u'Livro:',
+      105: u'Livro Discussão:',
+      11: u'Predefinição Discussão:',
+      10: u'Predefinição:',
+      13: u'Ajuda Discussão:',
+      12: u'Ajuda:',
+      15: u'Categoria Discussão:',
+      14: u'Categoria:',
+      829: u'Módulo Discussão:',
+      828: u'Módulo:'}
+
 def template(page, arg):
     functions = {u'Usuário': EditsAndRights,
                  u'Patrulhamento_de_IPs': ippatrol,
@@ -48,7 +76,7 @@ def query(query, db='ptwiki', host=None, limit=200):
 
 def link(wiki):
     wikis = {u'Wikipédia': 'pt.wikipedia', u'Wikilivros': 'pt.wikibooks', u'Wikiversidade': 'pt.wikiversity', u'Wikcionário': 'pt.wiktionary', u'Wikinotícias': 'pt.wikinews',
-             u'Wikiquote': 'pt.wikiquote', u'Wikisource': 'pt.wikisource', u'Wikivoyage': 'pt.wikivoyage'}
+	    u'Wikiquote': 'pt.wikiquote', u'Wikisource': 'pt.wikisource', u'Wikivoyage': 'pt.wikivoyage', u'metawiki': 'meta.wikimedia', u'commonswiki': 'commons.wikimedia'}
     link = wiki in wikis and wikis[wiki] or wiki[0:2] +u'.' + (wiki[2:] == u'wiki' and u'wikipedia' or wiki[2:])
     return link
 
@@ -82,7 +110,7 @@ def EditsAndRights(user):
         c.execute('''SELECT
  (CASE page_namespace WHEN 0 THEN "main" ELSE "others" END) AS namespace,
  COUNT(*),
- SUM(CASE WHEN rev_parent_id = 0 THEN 1 ELSE 0 END),
+ SUM(CASE WHEN rev_parent_id = 0 AND page_is_redirect = 0 THEN 1 ELSE 0 END),
  MIN(rev_timestamp)
  FROM revision_userindex
  FULL JOIN page
@@ -115,7 +143,7 @@ def EditsAndRights(user):
         vote = ptwikis[wiki] and (days >= ptwikis[wiki][0] and (main >= ptwikis[wiki][1] and u'<span style="color:#080"><b>Sim</b></span>' or
                u'<span style="color:#800">Não</span><br/><small>menos de {} edições</small>'.format(ptwikis[wiki][1])) or
                u'<span style="color:#800">Não</span><br/><small>menos de {} dias{}</small>'.format(ptwikis[wiki][0],
-               main < ptwikis[wiki][1] and u' e de {} edições'.format(ptwikis[wiki][1]))) or u'—'
+               main < ptwikis[wiki][1] and u' e de {} edições'.format(ptwikis[wiki][1]) or u'')) or u'—'
         # Administrador
         sysop = 'sysop' in g and u'<span style="color:#080"><b>É administrador</b></span>' or ptwikis[wiki] and len(ptwikis[wiki]) > 2 and (
                 days >= ptwikis[wiki][2] and (main >= ptwikis[wiki][3] and u'Pode candidatar-se' or
@@ -123,12 +151,12 @@ def EditsAndRights(user):
                 u'<span style="color:#800">Não pode</span><br/><small>menos de {} dias{}</small>'.format(ptwikis[wiki][2],
                 main < ptwikis[wiki][1] and u' e de {} edições'.format(ptwikis[wiki][1]))) or u'—'
         # Outros direitos
-        others = ptwikis[wiki] and len(ptwikis[wiki]) == 7 and 'sysop' not in g and ptwikis[wiki][4] not in g and (days >= ptwikis[wiki][2] and
-                (main >= ptwikis[wiki][3] and u'Pode candidatar-se a {}'.format(ptwikis[wiki][4]) or
+        others = ptwikis[wiki] and len(ptwikis[wiki]) == 7 and 'sysop' not in g and ptwikis[wiki][4] not in g and (days >= ptwikis[wiki][5] and
+                (main >= ptwikis[wiki][6] and u'Pode candidatar-se a {}'.format(ptwikis[wiki][4]) or
                 u'<span style="color:#800">Não pode candidatar-se a {}</span><br/><small>menos de {} edições</small>'.format(ptwikis[wiki][4], ptwikis[wiki][6])) or
                 u'<span style="color:#800">Não pode candidatar-se a {}</span><br/><small>menos de {} dias{}</small>'.format(ptwikis[wiki][4], ptwikis[wiki][5],
                 total < ptwikis[wiki][1] and u' e de {} edições'.format(ptwikis[wiki][6]))) or None
-        others = g and u'<br />'.join((others and [others] or []) + [u'<span style="color:#080"><b>É {}</b></span>'.format(i) for i in g if i != 'sysop']) or others or u'—'
+        others = g and u'<br />'.join((others and [others] or []) + [u'<span style="color:#080"><b>{}</b></span>'.format(i) for i in g if i != 'sysop']) or others or u'—'
         response[wiki] = {'time': wikitime, 'total': str(total), 'main': str(main), 'created': str(created), 'vote': vote, 'sysop': sysop, 'others': others, 'uploads': u}
     variables = dict([('{}_{}'.format(item, wiki), response[wiki][item])for wiki in response for item in response[wiki]])
     variables['user'] = user
@@ -143,22 +171,22 @@ def ippatrol(wiki=None):
  SUBSTR(rc_timestamp, 1, 10) AS HORA,
  SUM(CASE WHEN rc_user = 0 THEN 1 ELSE 0 END),
  SUM(CASE WHEN rc_user = 0 THEN rc_patrolled ELSE 0 END),
- SUM(CASE WHEN rc_comment LIKE ? OR rc_comment LIKE ? THEN 1 ELSE 0 END)
+ SUM(CASE WHEN rc_comment LIKE ? OR rc_comment LIKE ? OR rc_comment LIKE ? THEN 1 ELSE 0 END)
  FROM recentchanges
  WHERE rc_namespace = 0 AND rc_type != 5
  GROUP BY HORA
  ORDER BY rc_id DESC
- LIMIT 168''', ('[[WP:REV|%', u'Reversão de uma ou mais edições de%'))
+ LIMIT 168''', ('[[WP:REV|%', 'Foram [[WP:REV|%', u'Reversão de uma ou mais edições de%'))
         r1 = c.fetchall()
         c.execute('''SELECT
  SUBSTR(rc_timestamp, 1, 8) AS DIA,
  SUM(CASE WHEN rc_user = 0 THEN 1 ELSE 0 END),
  SUM(CASE WHEN rc_user = 0 THEN rc_patrolled ELSE 0 END),
- SUM(CASE WHEN rc_comment LIKE ? OR rc_comment LIKE ? THEN 1 ELSE 0 END)
+ SUM(CASE WHEN rc_comment LIKE ? OR rc_comment LIKE ? OR rc_comment LIKE ? THEN 1 ELSE 0 END)
  FROM recentchanges
  WHERE rc_namespace = 0 AND rc_type != 5
  GROUP BY DIA
- ORDER BY rc_id DESC''', ('[[WP:REV|%', u'Reversão de uma ou mais edições de%'))
+ ORDER BY rc_id DESC''', ('[[WP:REV|%', 'Foram [[WP:REV|%', u'Reversão de uma ou mais edições de%'))
         r2 = c.fetchall()
         r = {'wiki': wiki, 'link': link(wiki)}
 	r['iphquery'] = ','.join([(x in r1[6::6] and '\n[{},{},{},{}]' or '[{},{},{},{}]').format(*x) for x in r1])
@@ -278,7 +306,8 @@ def shortpages(wiki=None):
  ) p
  LEFT JOIN revision ON page_latest = rev_id
  LEFT JOIN categorylinks ON page_id = cl_from AND cl_to NOT LIKE '!%'
- GROUP BY page_title""", wiki)
+ GROUP BY page_title
+ ORDER BY page_len""", wiki)
     if r:
         resp = {'wiki': wiki, 'link': link(wiki), 'lista': r}
     else:
