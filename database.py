@@ -115,7 +115,7 @@ def EditsAndRights(user):
  FROM revision_userindex
  FULL JOIN page
  ON page_id = rev_page
- WHERE rev_user_text = ?
+ WHERE rev_user != 0 AND rev_user_text = ?
  GROUP BY namespace''', (user,))
         r = c.fetchall()
         if not r:
