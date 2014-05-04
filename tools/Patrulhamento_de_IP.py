@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+
+from flask import render_template_string
+from database import conn
+
+page = u'''
 {% extends "base.html" %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='rickshaw/rickshaw.min.css') }}">
@@ -154,3 +160,38 @@ var hoverDetaild = new Rickshaw.Graph.HoverDetail( {
   <option>Wikivoyage</option>
 </select>
 {% endblock %}
+'''
+
+def main(wiki=None):
+    if not wiki:
+        wiki = u'Wikipédia'
+    c = conn(wiki)
+    if c:
+        c.execute('''SELECT
+ SUBSTR(rc_timestamp, 1, 10) AS HORA,
+ SUM(CASE WHEN rc_user = 0 THEN 1 ELSE 0 END),
+ SUM(CASE WHEN rc_user = 0 THEN rc_patrolled ELSE 0 END),
+ SUM(CASE WHEN rc_comment LIKE ? OR rc_comment LIKE ? OR rc_comment LIKE ? THEN 1 ELSE 0 END)
+ FROM recentchanges
+ WHERE rc_namespace = 0 AND rc_type != 5
+ GROUP BY HORA
+ ORDER BY rc_id DESC
+ LIMIT 168''', ('[[WP:REV|%', 'Foram [[WP:REV|%', u'Reversão de uma ou mais edições de%'))
+        r1 = c.fetchall()
+        c.execute('''SELECT
+ SUBSTR(rc_timestamp, 1, 8) AS DIA,
+ SUM(CASE WHEN rc_user = 0 THEN 1 ELSE 0 END),
+ SUM(CASE WHEN rc_user = 0 THEN rc_patrolled ELSE 0 END),
+ SUM(CASE WHEN rc_comment LIKE ? OR rc_comment LIKE ? OR rc_comment LIKE ? THEN 1 ELSE 0 END)
+ FROM recentchanges
+ WHERE rc_namespace = 0 AND rc_type != 5
+ GROUP BY DIA
+ ORDER BY rc_id DESC''', ('[[WP:REV|%', 'Foram [[WP:REV|%', u'Reversão de uma ou mais edições de%'))
+        r2 = c.fetchall()
+        r = {'wiki': wiki, 'link': link(wiki)}
+	r['iphquery'] = ','.join([(x in r1[6::6] and '\n[{},{},{},{}]' or '[{},{},{},{}]').format(*x) for x in r1])
+	r['ipdquery'] = ','.join([(x in r2[6::6] and '\n[{},{},{},{}]' or '[{},{},{},{}]').format(*x) for x in r2][1:-1])
+    else:
+        r = {}
+    return render_template_string(page, title=u'Patrulhamento de IP' + (wiki and u': ' + wiki or u''), **r)
+

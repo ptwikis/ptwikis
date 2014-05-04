@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+
+from flask import render_template_string
+from database import query, link
+
+page = u'''
 {% extends "base.html" %}
 {% block content %}
 <p>Lista dos menores artigos da Wikipédia, desconsiderando as desambigações.</p>
@@ -16,3 +22,40 @@
 {%- endfor %}
 </table>
 {% endblock %}
+'''
+
+def main(wiki=None):
+    if not wiki:
+        wiki = u'Wikipédia'
+    r = query(u"""SELECT
+ page_title,
+ page_len,
+ rev_timestamp,
+ rev_user_text,
+ cl_to
+ FROM (
+  SELECT
+   page_id,
+   page_latest,
+   page_title,
+   page_len
+   FROM page
+   WHERE page_namespace = 0 AND page_is_redirect = 0 AND page_id NOT IN (
+    SELECT
+     cl_from
+     FROM categorylinks
+     WHERE cl_to = 'Desambiguação'
+   )
+   AND page_len < 800
+   ORDER BY page_len
+   LIMIT 100
+ ) p
+ LEFT JOIN revision ON page_latest = rev_id
+ LEFT JOIN categorylinks ON page_id = cl_from AND cl_to NOT LIKE '!%'
+ GROUP BY page_title
+ ORDER BY page_len""", wiki)
+    if r:
+        resp = {'wiki': wiki, 'link': link(wiki), 'lista': r}
+    else:
+        resp = {}
+    return render_template_string(page, title=u'Artigos curtos', **resp)

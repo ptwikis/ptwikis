@@ -3,8 +3,8 @@
 from flask import render_template_string, redirect
 from database import conn, link
 
-# Gráfico das ações de um filtro no tempo
-onefilter = u'''{% extends "base.html" %}
+# Gráfico das ações de um ou mais filtros no tempo
+filtergraph = u'''{% extends "base.html" %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='rickshaw/rickshaw.min.css') }}">
 <script src="{{ url_for('static', filename='rickshaw/vendor/d3.min.js') }}"></script>
@@ -13,26 +13,49 @@ onefilter = u'''{% extends "base.html" %}
 <style> svg {box-shadow: 0 0 3px} </style>
 {% endblock %}
 {% block content %}
-{% if query %}
+{% if filters %}
 <div id="graph"></div>
+<div style= "margin:20px 10px 10px 10px" id="legend"></div>
 
 <script>
 
-var data = {
-    nada: [],
-    etiq: [],
-    aviso: [],
-    desaut: [],
-    raw: {{ query }}
+var filters = { {% for f, query in filters.iteritems()  %}
+  {{ f }}: {{ query }}{% if loop.revindex != 1 %},{% endif %}
+{%- endfor %}
+};{% if 1 != filters|length %}
+var names = { {% for f, name in names.iteritems() %}
+  {{ f }}: "{{ name }}"{% if loop.revindex != 1 %},{% endif %}
+{%- endfor %}
 };
+var colors = [['#FFA', '#FE5', '#FD0', '#A90'], ['#AFA', '#5F5', '#0F0', '#0A0'], ['#AAF', '#55F', '#00F', '#00A'], ['#FBB', '#F77', '#F00', '#A00']];
+{%- else %}
+var colors = [['#3F5', '#FE1', '#15F', '#D12']];
+{%- endif %}
+var legend = document.getElementById('legend');
+var series = [];
 
-for (d in data.raw){
-    var time = String(data.raw[d][0]);
-    time = Date.UTC(time.substr(0, 4), time.substr(4, 2)-1, time.substr(6, 2))/1000;
-    data.nada.push({x: time, y: data.raw[d][1]});
-    data.etiq.push({x: time, y: data.raw[d][2]});
-    data.aviso.push({x: time, y: data.raw[d][3]});
-    data.desaut.push({x: time, y: data.raw[d][4]});
+for (var f in filters){
+    var data = [[], [], [], []];
+    var action = [0, 0, 0, 0];
+    var color = colors.pop();
+    for (var d in filters[f]){
+        var time = String(filters[f][d][0]);
+        time = Date.UTC(time.substr(0, 4), time.substr(4, 2)-1, time.substr(6, 2))/1000;
+        data[0].push({x: time, y: filters[f][d][1]});
+        data[1].push({x: time, y: filters[f][d][2]});
+        data[2].push({x: time, y: filters[f][d][3]});
+        data[3].push({x: time, y: filters[f][d][4]});
+        action = [action[0] || filters[f][d][1], action[1] || filters[f][d][2], action[2] || filters[f][d][3], action[3] || filters[f][d][4]];
+    }
+    for (var a=0; a<4; a++){
+        if (action[a]){
+            series.push({name: 'Filtro ' + f + ':' + ['Sem ação', 'Etiquetas', 'Avisos', 'Desautorizações'][a], data: data[a], color: color[a]});
+{%- if 1 != filters|length %}
+            legend.innerHTML += '<span style="display:inline-block; width:40px; height:6px; border-bottom:5px solid ' +
+                color[a] + '">&nbsp;</span> '  + names[f] + ' – ' + ['Sem ação', 'Etiquetas', 'Avisos', 'Desautorizações'][a] + '<br/>';
+{%- endif %}
+        }
+    }
 }
 
 var graph = new Rickshaw.Graph( {
@@ -42,23 +65,7 @@ var graph = new Rickshaw.Graph( {
     renderer: 'line',
     stroke: true,
     preserve: true,
-    series: [{% if actions[0] %}{
-	name: "{% if link[0:2] == "pt" %}Sem ação{% else %}No action{% endif %}",
-        data: data.nada,
-        color: '#3F5'
-    }, {% endif %}{% if actions[1] %}{
-	name: "{% if link[0:2] == "pt" %}Etiquetas{% else %}Tags{% endif %}",
-        data: data.etiq,
-        color: '#FE1'
-    }, {% endif %}{% if actions[2] %}{
-	name: "{% if link[0:2] == "pt" %}Avisos{% else %}Warns{% endif %}",
-        data: data.aviso,
-        color: '#15F'
-    }, {% endif %}{% if actions[3] %}{
-	name: "{% if link[0:2] == "pt" %}Desautorizações{% else %}Disallows{% endif %}",
-        data: data.desaut,
-        color: '#D12',
-    }{% endif %}]
+    series: series
 });
 
 var x_axish = new Rickshaw.Graph.Axis.Time({
@@ -129,7 +136,7 @@ ERRO
 def main(args=None):
     if not args:
         wiki, filter = u'Wikipédia', None
-    elif args.isdigit():
+    elif args.replace(u'&', u'').isdigit():
         wiki, filter = u'Wikipédia', args
     elif args.split(':')[0] not in (u'Wikipédia', u'Wikilivros', u'Wikinotícias', u'Wikicionário', u'Wikiversidade', u'Wikiquote', u'Wikisource', u'Wikivoyage'):
 	return redirect('https://tools.wmflabs.org/ptwikis/Filters:' + args)
@@ -161,24 +168,29 @@ def main(args=None):
         r = c.fetchall()
         r = [(int(f), t and t.decode('utf8') or u'', int(n), int(a), int(e), int(d)) for f, t, n, a, e, d in r]
         r = {'wiki': wiki, 'link': link(wiki), 'filters': r, 'max': max(map(max, [f[2:] for f in r]))}
-	return render_template_string(allfilters, title=r['link'][0:2] == 'pt' and 'Filtros' or 'Filters', **r)
-    elif c and filter: # Um filtro ao longo do tempo
-        c.execute('''SELECT
- SUBSTR(afl_timestamp, 1, 8) mês,
+	return render_template_string(allfilters, title='Filtros', **r)
+    elif c and filter: # Um ou mais filtros ao longo do tempo
+        query = '''SELECT
+ SUBSTR(afl_timestamp, 1, 8) dia,
  SUM(afl_actions = '') nada,
  SUM(afl_actions = 'tag') etiq,
  SUM(afl_actions = 'warn') aviso,
  SUM(afl_actions = 'disallow') desaut
  FROM abuse_filter_log
- WHERE afl_filter = ? AND afl_timestamp LIKE '2013%'
- GROUP BY WEEK(afl_timestamp)''', (filter,))
-        r = c.fetchall()
-	c.execute('SELECT af_public_comments FROM abuse_filter WHERE af_id = ?', (filter,))
-	title = c.fetchone()
-	r = {'wiki': wiki, 'link': link(wiki), 'query': [map(int, l) for l in r]}
-	r['actions'] = map(max, zip(*r['query'])[1:])
-	title = (r['link'][0:2] == 'pt' and 'Filtro ' or 'Filter ') + filter + u' – ' + title[0].decode('utf-8') 
-	return render_template_string(onefilter, title=title, **r)
+ WHERE afl_filter = ? AND afl_timestamp > DATE_FORMAT(SUBDATE(NOW(), INTERVAL 1 YEAR), '%Y%m%d%H%i%s')
+ GROUP BY WEEK(afl_timestamp)
+ ORDER BY dia'''
+        filter = filter.split('&')
+        filters, names = {}, {}
+        for f in filter[0:4]:
+            c.execute(query, (f,))
+            r = c.fetchall()
+            filters[f] = [map(int, l) for l in r]
+	    c.execute('SELECT af_public_comments FROM abuse_filter WHERE af_id = ?', (filter[0],))
+	    names[f] = 'Filtro ' + f + u' – ' + c.fetchone()[0].decode('utf-8')
+        title = len(filter) == 1 and names[filter[0]] or ' + '.join(['Filtro ' + f for f in filter[0:4]])
+	r = {'wiki': wiki, 'link': link(wiki), 'filters': filters, 'names': names}
+	return render_template_string(filtergraph, title=title, **r)
     else:
         r = {}
         return render_template_string(allfilters, title=u'Filtros', **r)

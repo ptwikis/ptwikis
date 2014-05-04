@@ -1,13 +1,11 @@
 # -*- coding: utf-8  -*-
 
-import cgitb
-cgitb.enable()
-
 from flask import Flask, url_for, render_template, request
 from urllib import quote
 import re, os
 
 app = Flask(__name__)
+app.debug = True
 
 @app.route('/')
 def index(page=None):
@@ -17,8 +15,9 @@ def index(page=None):
 def htmlpage(page=None):
     page = page.split(':', 1)
     html = (page[0] + u'.html').encode('utf8')
-    if page[0] + '.py' in os.listdir(app.root_path + '/tools'):
-      filename = app.root_path + '/tools/' + page[0] + '.py'
+    filename = (page[0] + u'.py').encode('utf-8')
+    if filename in os.listdir(app.root_path + '/tools'):
+      filename = app.root_path + '/tools/' + filename
       with open(filename, 'r') as f:
         source = f.read()
       tool = {}
