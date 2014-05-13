@@ -6,7 +6,7 @@ from database import query, link
 page = u'''
 {% extends "base.html" %}
 {% block content %}
-<p>Lista dos menores artigos da Wikipédia, desconsiderando as desambigações.</p>
+<p>Lista dos menores artigos da Wikipédia, desconsiderando as desambiguações.</p>
 <table class="wikitable">
 	<tr><th rowspan=2>Artigo</th><th rowspan=2>Tamanho</th><th colspan=2>Última edição</th><th rowspan=2>Categoria</th></tr>
   <tr><th>Data</th><th>Usuário</th></tr>

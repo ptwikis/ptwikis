@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import render_template_string
-from database import conn
+from database import conn, link
 
 page = u'''
 {% extends "base.html" %}
@@ -19,7 +19,7 @@ page = u'''
 <div id="iph"></div>
 <br/><br/><p>Gráfico para os últimos 30 dias:</p>
 <div id="ipd"></div>
-{% if wiki == "Wikipédia" %}<p>* As reversões são obtidas pelo sumário da edição ("[[WP:REV|..." e "Reversão de uma ou mais edições de..."), o número não é totalmente preciso.</p>{% endif %}
+{% if wiki == "Wikipédia" %}<p>* As reversões são obtidas pelo sumário da edição ("Foram [[WP:REV|..." e "Reversão de uma ou mais edições de..."), o número não é totalmente preciso.</p>{% endif %}
 
 <script>
 
@@ -182,16 +182,16 @@ def main(wiki=None):
  SUBSTR(rc_timestamp, 1, 8) AS DIA,
  SUM(CASE WHEN rc_user = 0 THEN 1 ELSE 0 END),
  SUM(CASE WHEN rc_user = 0 THEN rc_patrolled ELSE 0 END),
- SUM(CASE WHEN rc_comment LIKE ? OR rc_comment LIKE ? OR rc_comment LIKE ? THEN 1 ELSE 0 END)
+ SUM(CASE WHEN rc_comment LIKE ? OR rc_comment LIKE ? THEN 1 ELSE 0 END)
  FROM recentchanges
  WHERE rc_namespace = 0 AND rc_type != 5
  GROUP BY DIA
- ORDER BY rc_id DESC''', ('[[WP:REV|%', 'Foram [[WP:REV|%', u'Reversão de uma ou mais edições de%'))
+ ORDER BY rc_id DESC''', ('Foram [[WP:REV|%', u'Reversão de uma ou mais edições de%'))
         r2 = c.fetchall()
         r = {'wiki': wiki, 'link': link(wiki)}
 	r['iphquery'] = ','.join([(x in r1[6::6] and '\n[{},{},{},{}]' or '[{},{},{},{}]').format(*x) for x in r1])
 	r['ipdquery'] = ','.join([(x in r2[6::6] and '\n[{},{},{},{}]' or '[{},{},{},{}]').format(*x) for x in r2][1:-1])
     else:
         r = {}
-    return render_template_string(page, title=u'Patrulhamento de IP' + (wiki and u': ' + wiki or u''), **r)
+    return render_template_string(page, title=u'Patrulhamento de IPs' + (wiki and u': ' + wiki or u''), **r)
 
