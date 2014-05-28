@@ -10,11 +10,23 @@ filtergraph = u'''{% extends "base.html" %}
 <script src="{{ url_for('static', filename='rickshaw/vendor/d3.min.js') }}"></script>
 <script src="{{ url_for('static', filename='rickshaw/rickshaw.min.js') }}"></script>
 
-<style> svg {box-shadow: 0 0 3px} </style>
+<style> #graph svg {box-shadow: 0 0 3px} </style>
 {% endblock %}
 {% block content %}
 {% if filters %}
-<div id="graph"></div>
+<div id="graph"></div>{% if 1 != filters|length %}
+<svg width="800" height="30"><g stroke="black" stroke-width="2">
+  <path stroke-dasharray="2,2" d="M20 10 l45 0" />
+  <path stroke-dasharray="4,4" d="M210 10 l45 0" />
+  <path stroke-dasharray="2,2,8,2" d="M400 10 l45 0" />
+  <path d="M590 10 l45 0" />
+</g>
+<g fill="black">
+  <text x="70" y="15">Sem ação</text>
+  <text x="260" y="15">Etiquetas</text>
+  <text x="450" y="15">Avisos</text>
+  <text x="640" y="15">Desautorizações</text>
+</g></svg>{% endif %}
 <div style= "margin:20px 10px 10px 10px" id="legend"></div>
 
 <script>
@@ -27,17 +39,17 @@ var names = { {% for f, name in names.iteritems() %}
   {{ f }}: "{{ name }}"{% if loop.revindex != 1 %},{% endif %}
 {%- endfor %}
 };
-var colors = [['#FFA', '#FE5', '#FD0', '#A90'], ['#AFA', '#5F5', '#0F0', '#0A0'], ['#AAF', '#55F', '#00F', '#00A'], ['#FBB', '#F77', '#F00', '#A00']];
+var palette = new Rickshaw.Color.Palette({scheme: 'munin'});
 {%- else %}
-var colors = [['#3F5', '#FE1', '#15F', '#D12']];
+var colors = ['#3F5', '#FE1', '#15F', '#D12'];
 {%- endif %}
 var legend = document.getElementById('legend');
 var series = [];
 
 for (var f in filters){
     var data = [[], [], [], []];
-    var action = [0, 0, 0, 0];
-    var color = colors.pop();
+    var action = [0, 0, 0, 0];{% if 1 != filters|length %}
+    var color = palette.color();{% endif %}
     for (var d in filters[f]){
         var time = String(filters[f][d][0]);
         time = Date.UTC(time.substr(0, 4), time.substr(4, 2)-1, time.substr(6, 2))/1000;
@@ -49,13 +61,13 @@ for (var f in filters){
     }
     for (var a=0; a<4; a++){
         if (action[a]){
-            series.push({name: 'Filtro ' + f + ':' + ['Sem ação', 'Etiquetas', 'Avisos', 'Desautorizações'][a], data: data[a], color: color[a]});
-{%- if 1 != filters|length %}
-            legend.innerHTML += '<span style="display:inline-block; width:40px; height:6px; border-bottom:5px solid ' +
-                color[a] + '">&nbsp;</span> '  + names[f] + ' – ' + ['Sem ação', 'Etiquetas', 'Avisos', 'Desautorizações'][a] + '<br/>';
-{%- endif %}
+            series.push({name: 'Filtro ' + f + ':' + ['Sem ação', 'Etiquetas', 'Avisos', 'Desautorizações'][a], data: data[a], color: color{% if 1 == filters|length %}s[a]{% endif %}});
         }
     }
+{%- if 1 != filters|length %}
+    legend.innerHTML += '<span style="display:inline-block; width:40px; height:3px; border-top:4px solid ' +
+        color + '"></span> <a href="//{{ link }}.org/wiki/Especial:Filtro_de_abusos/' + f + '">' + names[f] + '</a><br/>';
+{%- endif %}
 }
 
 var graph = new Rickshaw.Graph( {
@@ -72,10 +84,24 @@ var x_axish = new Rickshaw.Graph.Axis.Time({
     graph: graph,
 });
 
-graph.render();
+graph.render();{% if 1 != filters|length %}
+graph.series.forEach(function(series){ switch (series.name.substr(series.name.indexOf(':'))){
+    case ':Sem ação':
+        series.path.setAttribute('stroke-dasharray', '2,2');
+        break;
+    case ':Etiquetas':
+        series.path.setAttribute('stroke-dasharray', '4,4');
+        break;
+    case ':Avisos':
+        series.path.setAttribute('stroke-dasharray', '2,2,8,2');
+}});{% endif %}
 
 var hoverDetailh = new Rickshaw.Graph.HoverDetail( {
     graph: graph,
+    xFormatter: function(x){
+        var d = new Date(x * 1000);
+        var d2 = new Date((x + 518400) * 1000);
+        return d.toLocaleDateString() + ' – ' + d2.toLocaleDateString();},
     yFormatter: function(y){return Math.floor(y)}
 });
 </script>
@@ -86,36 +112,71 @@ var hoverDetailh = new Rickshaw.Graph.HoverDetail( {
 
 ## Gráfico de barra de todos filtros
 allfilters = u'''{% extends "base.html" %}
+{% block head %}
+        <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+        <style>.selected td {background-color: #FFE}</style>
+        <script>
+var filters = [];
+
+function checkchange(checkbox){
+  var tr = checkbox.parentNode.parentNode;
+  if (!checkbox.checked && tr.className == "selected"){
+    tr.className = "";
+    filters.splice(filters.indexOf(checkbox.name), 1);
+  }else if(checkbox.checked && !tr.className){
+    tr.className = "selected";
+    filters.push(checkbox.name);
+  }
+  buttoncheck();
+}
+function showgraph(){
+  location.href = location.href + ':' + filters.sort().join('&');
+}
+function buttoncheck(){
+  var disable = !filters.length;
+  $(":button").each(function(i, elem){ elem.disabled = disable });
+}
+$(document).ready(function(){
+  $("input").each(function(i, elem){
+    if (elem.type == "checkbox" && elem.checked){
+      elem.parentNode.parentNode.className = "selected";
+      filters.push(elem.name);
+    }
+  });
+  buttoncheck();
+});
+        </script>
+{% endblock %}
 {% block content %}
 
 
-<p>{% if link[0:2] == "pt" %}Ações de filtros {% if wiki == "Wikipédia" %}na{% else %}no{% endif %} {{ wiki }} nos últimos 30 dias:
-{% else %}Filters actions in the last 30 days:{% endif %}</p>
+<p>Ações de filtros {% if wiki == "Wikipédia" %}na{% else %}no{% endif %} {{ wiki }} nos últimos 30 dias:</p>
 <br/>
-<p><b>Legend{% if link[0:2] == "pt" %}a{% endif %}: <span style="background-color:lightgreen">&nbsp; {% if link[0:2] == "pt" %}Correspondências sem ação{% else %}No action{% endif %} &nbsp;</span> 
-<span style="background-color:#55F; color:white">&nbsp; {% if link[0:2] == "pt" %}Avisos{% else %}Warn{% endif %} &nbsp;</span> 
-<span style="background-color:gold">&nbsp; {% if link[0:2] == "pt" %}Etiquetas{% else %}Tag{% endif %} &nbsp;</span> 
-<span style="background-color:red; color:white">&nbsp; {% if link[0:2] == "pt" %}Desautorizações{% else %}Disallow{% endif %} &nbsp;</span></b></p>
-  </tr>
+<p style="float:left"><b>Legenda: <span style="background-color:lightgreen">&nbsp; Correspondências sem ação &nbsp;</span> 
+<span style="background-color:#55F; color:white">&nbsp; Avisos &nbsp;</span> 
+<span style="background-color:gold">&nbsp; Etiquetas &nbsp;</span> 
+<span style="background-color:red; color:white">&nbsp; Desautorizações &nbsp;</span></b></p>
 {% if filters %}
+<input type="button" style="float:right; margin-top:20px" value="Ver gráfico" onclick="showgraph()">
 <table style="width:100%" border=1 rules=rows frame=none bordercolor=lightgray>
 {%- for f, t, n, a, e, d in filters %}
 <tr>
   <td style="width:50px; font-size:1.8em; margin:5px 5px 5px 5px">
-    <a href="//{{ link }}.org/wiki/{% if link[0:2] == "pt" %}Especial:Filtro_de_abusos{% else %}Special:AbuseFilter{% endif %}/{{ f }}" title="{{ t }}">{{ f }}</a>
+    <a href="//{{ link }}.org/wiki/Especial:Filtro_de_abusos/{{ f }}" title="{{ t }}">{{ f }}</a>
   </td>
-  <td style="font-size:x-small">{% if n %}
-    <div style="width:{{ (n * 100 / max)|round(1) }}%; height:10px; background-color:lightgreen" title="{{ n }} {% if link[0:2] == "pt" %}correspondências sem ação sobre{% else %}no action matches about{% endif %} {{ t|lower }}"></div>{% endif %}{% if a %}
-    <div style="width:{{ (a * 100 / max)|round(1) }}%; height:10px; background-color:#55F" title="{{ a }} {% if link[0:2] == "pt" %}avisos sobre{% else %}warns about{% endif %} {{ t|lower }}"></div>{% endif %}{% if e %}
-    <div style="width:{{ (e * 100 / max)|round(1) }}%; height:10px; background-color:gold" title="{{ e }} {% if link[0:2] == "pt" %}etiquetas sobre{% else %}tags about{% endif %} {{ t|lower }}"></div>{% endif %}{% if d %}
-    <div style="width:{{ (d * 100 / max)|round(1) }}%; height:10px; background-color:red" title="{{ d }} {% if link[0:2] == "pt" %}desautorizações sobre{% else %}disallows about{% endif %} {{ t|lower }}"></div>{% endif %}
+  <td style="font-size:x-small">{{ t }}{% if n %}
+    <div style="width:{{ (n * 100 / max)|round(1) }}%; height:10px; background-color:lightgreen" title="{{ n }} correspondências sem ação sobre {{ t|lower }}"></div>{% endif %}{% if a %}
+    <div style="width:{{ (a * 100 / max)|round(1) }}%; height:10px; background-color:#55F" title="{{ a }} avisos sobre {{ t|lower }}"></div>{% endif %}{% if e %}
+    <div style="width:{{ (e * 100 / max)|round(1) }}%; height:10px; background-color:gold" title="{{ e }} etiquetas sobre {{ t|lower }}"></div>{% endif %}{% if d %}
+    <div style="width:{{ (d * 100 / max)|round(1) }}%; height:10px; background-color:red" title="{{ d }} desautorizações sobre {{ t|lower }}"></div>{% endif %}
   </td>
   <td style="font-size:0.8em; width:8px">
-    <script>document.write('<a href="' + location.href + ':{{ f }}" title="{% if link[0:2] == "pt" %}Gráfico do filtro {{ f }}{% else %}Filter {{ f }} graph{% endif %}"><b>G</b></a>')</script>
+    <input type="checkbox" onchange="checkchange(this)" name="{{ f }}" />
   </td>
 </tr>
 {%- endfor %}
 </table>
+<input type="button" style="float:right" value="Ver gráfico" onclick="showgraph()">
 {% else %}
 ERRO
 {% endif %}
@@ -136,7 +197,7 @@ ERRO
 def main(args=None):
     if not args:
         wiki, filter = u'Wikipédia', None
-    elif args.replace(u'&', u'').isdigit():
+    elif args.replace(u'&', u'').replace(u'_', u'').isdigit():
         wiki, filter = u'Wikipédia', args
     elif args.split(':')[0] not in (u'Wikipédia', u'Wikilivros', u'Wikinotícias', u'Wikicionário', u'Wikiversidade', u'Wikiquote', u'Wikisource', u'Wikivoyage'):
 	return redirect('https://tools.wmflabs.org/ptwikis/Filters:' + args)
@@ -155,10 +216,10 @@ def main(args=None):
  FROM (
  SELECT
  afl_filter AS F,
- SUM(CASE WHEN afl_actions = '' THEN 1 ELSE 0 END) AS N,
- SUM(CASE WHEN afl_actions = 'warn' THEN 1 ELSE 0 END) AS A,
- SUM(CASE WHEN afl_actions = 'tag' THEN 1 ELSE 0 END) AS E,
- SUM(CASE WHEN afl_actions = 'disallow' THEN 1 ELSE 0 END) AS D
+ SUM(afl_actions = '') AS N,
+ SUM(afl_actions = 'warn') AS A,
+ SUM(afl_actions = 'tag') AS E,
+ SUM(afl_actions = 'disallow') AS D
  FROM abuse_filter_log
  WHERE afl_timestamp > DATE_FORMAT(SUBDATE(NOW(), INTERVAL 30 DAY), '%Y%m%d%H%i%s')
  GROUP BY afl_filter) AS stats
@@ -180,15 +241,20 @@ def main(args=None):
  WHERE afl_filter = ? AND afl_timestamp > DATE_FORMAT(SUBDATE(NOW(), INTERVAL 1 YEAR), '%Y%m%d%H%i%s')
  GROUP BY WEEK(afl_timestamp)
  ORDER BY dia'''
-        filter = filter.split('&')
+        filter = [f for f in filter.split('&') if f][0:10]
         filters, names = {}, {}
-        for f in filter[0:4]:
+        for f in filter:
             c.execute(query, (f,))
             r = c.fetchall()
-            filters[f] = [map(int, l) for l in r]
-	    c.execute('SELECT af_public_comments FROM abuse_filter WHERE af_id = ?', (filter[0],))
+            filters[f] = []
+            for l in r:
+              if l[0][4:] == '0101' and filters[f] and int(str(filters[f][-1][0])[4:]) > 1225:
+                filters[f][-1] = [filters[f][-1][0]] + [int(l[i]) + filters[f][-1][i] for i in range(1, 5)]
+              else:
+                filters[f].append(map(int, l))
+	    c.execute('SELECT af_public_comments FROM abuse_filter WHERE af_id = ?', (f,))
 	    names[f] = 'Filtro ' + f + u' – ' + c.fetchone()[0].decode('utf-8')
-        title = len(filter) == 1 and names[filter[0]] or ' + '.join(['Filtro ' + f for f in filter[0:4]])
+        title = len(filter) == 1 and names[filter[0]] or ' + '.join(['Filtro ' + f for f in filter])
 	r = {'wiki': wiki, 'link': link(wiki), 'filters': filters, 'names': names}
 	return render_template_string(filtergraph, title=title, **r)
     else:
