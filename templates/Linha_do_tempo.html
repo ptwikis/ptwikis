@@ -49,9 +49,9 @@
       <div id="timeline"></div>
       <div id="slider"></div>
     </div>
-    <div id="panel">
+    <div id="panel1">
       <div id="legend" class="section"></div>
-      <div id="panel" class="section">
+	<div id="panel" class="section">
 	<form id="panel" name="events_selector">
 	  Geral: <input type="radio" name="evento" value="geral" onClick="switch_events(this.value)"> <br/>
 	  Vandalismo: <input type="radio" name="evento" checked="" value="vandalismo" onClick="switch_events(this.value)"> <br/>	
@@ -60,17 +60,26 @@
 	  Comunidade: <input type="radio" name="evento" value="comunidade" onClick="switch_events(this.value)"> <br/>
 	</form>
       </div>
-      <div id="about" class="section">
-	<p>A Linha do Tempo é uma visualização que combina os eventos da wikipédia e seus dados. Os eventos estão na página <a href="https://pt.wikipedia.org/wiki/Wikip%C3%A9dia:Arqueologia/Linha_do_tempo">Wikipédia:Arqueologia/Linha do tempo</a> e foram listados por voluntários com o objetivo de estudar acontecimentos relevantes para a enciclopédia livre. 
+    <div id="dynamicdata">
+      <div id="legenddyn" class="section">
       </div>
     </div>
+      <div id="about" class="section">
+	<p>A Linha do Tempo é uma visualização que combina os eventos da wikipédia e seus dados. Os eventos estão na página <a href="https://pt.wikipedia.org/wiki/Wikip%C3%A9dia:Arqueologia/Linha_do_tempo">Wikipédia:Arqueologia/Linha do tempo</a> e foram listados por voluntários com o objetivo de estudar acontecimentos relevantes para a enciclopédia livre. Os dados aqui usados são gerados automaticamente por script e estão disponéveis para <a href="http://tools.wmflabs.org/ptwikis/static/timeline/data/linha_data.tsv">download no formato .tsv</a>.</p>
+      </div>
   </div>
 
 <!-- The source code goes here: -->
 <script src="static/timeline/src/js/main.js">
-//data_render( "static/timeline/data/wiki_data.tsv" );
-//events_render( "static/timeline/data/events.json" );
+</script>
+<script src="static/timeline/src/js/dyn.js">
+</script>
+<script>
+//data_render( "ptwikis/static/timeline/data/wiki_data.tsv" );
+//events_render( "ptwikis/static/timeline/data/events.json" );
+//create_dyn_form();
 </script>
 
 {% endblock %}
+
 

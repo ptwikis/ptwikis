@@ -37,8 +37,7 @@ ns = {1: u'Discussão:',
 
 def template(page, arg):
     functions = {u'Editor_Visual': visualeditor,
-		 u'Interface_Movel': interfacemovel,
-		 u'Acessos': acessos}
+		 u'Interface_Movel': interfacemovel}
     if page in functions:
         return functions[page](arg)
     else:

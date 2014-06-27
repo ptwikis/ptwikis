@@ -2,6 +2,7 @@
 
 from flask import render_template_string
 from database import conn
+from time import time
 
 page = u'''
 {% extends "Tools.html" %}
@@ -24,28 +25,38 @@ page = u'''
  <tr>
   <th></th>
   <th>Country</th>
-  <th>Images</th>
+  <th>Images*</th>
   <th>Images used<br/>in the wikis</th>
   <th>Uploaders</th>
-  <th>Uploaders regitered<br/>in May 2014</th></tr>
+  <th>Uploaders registered<br/>after 30 April 2014</th></tr>
 </table>
+<p>*The number of images does not consider images uploaded after respective campaign end time.</p>
 <script>
 
 var series = [
   {{ query }}
 ];
-series = series.sort(function(a, b){return b.data.slice(-1)[0].y - a.data.slice(-1)[0].y})
 var palette = new Rickshaw.Color.Palette({scheme: 'munin'});
 var contries = document.getElementById('countries');
 for (var i = 0; i < series.length; i++){
   series[i]['color'] = palette.color(i);
+}
+series = series.sort(function(a, b){return b.data.slice(-1)[0].y - a.data.slice(-1)[0].y})
+for (var i = 0; i < series.length; i++){
+  var endtime = Date.UTC(series[i].endtime.substr(0, 4), series[i].endtime.substr(4, 2) - 1, series[i].endtime.substr(6, 2), series[i].endtime.substr(8, 2))/1000;
+  var xmax = Math.min(endtime, {{ now }});
   var uploads = series[i].data.slice(-1)[0].y;
-  countries.innerHTML += '\\n<tr><td><span style="display:inline-block; width:40px; height:2px; border-top:4px solid ' +
-    series[i].color + '"></span></td><td style="background-color:#F8F8F8">'  + series[i].name + '</td><td>' + String(uploads) +
-    '</td><td style="background-color:#F8F8F8">' + String(series[i].usage) + ' (' + String(Math.round(100 * series[i].usage / uploads)) +
-    '%)</td><td><a href="./WLE:' + series[i].name.replace(/ /g, '_') + '">' + String(series[i].users[0]) + '</a></td><td style="background-color:#F8F8F8">' +
+  if (series[i].data.slice(-1)[0].x < xmax) series[i].data.push({x:xmax, y:uploads});
+  else if(series[i].data.slice(-1)[0].x > xmax) series[i].data.splice(-1, 1, {x:xmax, y:uploads});
+  countries.innerHTML += '<tr><td><span style="display:inline-block; width:40px; height:2px; border-top:4px solid ' + series[i].color +
+     '"></span></td><td style="background-color:#F8F8F8">' + series[i].name.replace('the ', '') +
+    '</td><td><a href="//tools.wmflabs.org/images/?cat=Images_from_Wiki_Loves_Earth_2014_in_' + series[i].name.replace(/ /g, '_') +
+    (series[i].endtime ? '&until=' + String(series[i].endtime) + '0000' : '') + '">' + String(uploads) + '</a></td><td style="background-color:#F8F8F8">' +
+    String(series[i].usage) + ' (' + String(Math.round(100 * series[i].usage / uploads)) + '%)</td><td><a href="./WLE:' +
+    series[i].name.replace(/ /g, '_').replace('the_', '') + '">' + String(series[i].users[0]) + '</a></td><td style="background-color:#F8F8F8">' +
     String(series[i].users[1]) + ' (' + String(Math.round(100 * series[i].users[1] / series[i].users[0])) + '%)</td></tr>';
 }
+console.log(series);
 
 var graph = new Rickshaw.Graph( {
     element: document.getElementById("graph"),
@@ -69,8 +80,7 @@ var hoverDetail = new Rickshaw.Graph.HoverDetail( {
     graph: graph,
     xFormatter: function(x){
         var d = new Date(x * 1000);
-        var dia = String(d.getUTCDate());
-        return 'day ' + dia;
+        return d.toUTCString();
     },
     yFormatter: function(y){return y}
 });
@@ -92,6 +102,7 @@ pageUsers = u'''
 {% endblock %}
 {% block content %}
 <p>Uploaders for Wiki Loves Earth campaign in {{ name }}.</p>
+<p>Images are in <a href="https://commons.wikimedia.org/wiki/Category:Images_from_Wiki_Loves_Earth_2014_in_{{ name|replace(' ', '_') }}">Category:Images from Wiki Loves Earth 2014 in {{ name }}</a></p>
 {% if query %}
 <table style="text-align:center; border-collapse:collapse; min-width:800px; margin-top:8px">
  <tr>
@@ -100,10 +111,10 @@ pageUsers = u'''
   <th>Images used<br/>in the wikis</th>
   <th>Registration</th>
 {% for user in query %}<tr>
-  <td><a href="https://commons.wikimedia.org/wiki/Special:Contributions/{{ user[0]|replace(' ', '_') }}">{{ user[0] }}</a></td>
+  <td><a href="https://commons.wikimedia.org/w/index.php?title=Special:ListFiles&limit=250&user={{ user[0]|replace(' ', '_') }}">{{ user[0] }}</a></td>
   <td style="background-color:#F8F8F8">{{ user[1] }}</td>
   <td>{{ user[2] }}</td>
-  <td style="background-color:#F8F8F8{% if user[3][-7:] == '05/2014' %}; color:#080{% endif %}">{{ user[3] }}</td>
+  <td style="background-color:#F8F8F8{% if user[3][-5:] == '/2014' and 5 <= user[3][3:5]|int %}; color:#080{% endif %}">{{ user[3] }}</td>
 </tr>{% endfor %}
 </table>
 {%- else %}
@@ -112,25 +123,46 @@ pageUsers = u'''
 {% endblock %}
 '''
 
+endtime ={
+  u'Armenia & Nagorno-Karabakh': 2014053119,
+  u'Austria': 2014053121,
+  u'Azerbaijan': 2014053118,
+  u'Brazil': 2014060104,
+  u'Andorra & Catalan areas': 2014053121,
+  u'Germany': 2014063021,
+  u'Algeria': 2014063022,
+  u'Estonia': 2014053120,
+  u'Ghana': 2014063023,
+  u'India': 2014063023,
+  u'Macedonia': 2014053121,
+  u'the Netherlands': 2014063021,
+  u'Nepal': 2014053117,
+  u'Serbia': 2014071422,
+  u'Ukraine': 2014053120}
+
 def main(name=None):
     c = conn('commonswiki')
     if c and not name:
         c.execute(u'''SELECT
  SUBSTR(cl_to, 38) país,
  UNIX_TIMESTAMP(SUBSTR(img_timestamp, 1, 8)) dia,
+ SUBSTR(img_timestamp, 1, 10) hora,
  COUNT(*) upload
  FROM categorylinks INNER JOIN page ON cl_from = page_id INNER JOIN image ON page_title = img_name
  WHERE cl_type = 'file' AND cl_to IN (SELECT
    page_title
    FROM page
    WHERE page_namespace = 14 AND page_title LIKE 'Images_from_Wiki_Loves_Earth_2014_in_%' AND page_title NOT LIKE '%\_-\_%')
- GROUP BY país, dia''')
-        r = [(i[0].decode('utf-8').replace(u'_', u' '), int(i[1]), int(i[2])) for i in c.fetchall()]
+ GROUP BY país, hora''')
+        r = [(i[0].decode('utf-8').replace(u'_', u' '), int(i[1]) + 86400, int(i[2]), int(i[3])) for i in c.fetchall()]
+        r = [(i[0], i[1], i[3]) for i in r if i[0] not in endtime or i[2] <= endtime[i[0]]]
+        r = [(d[0], d[1], sum(h[2] for h in r if (h[0], h[1]) == d)) for d in set((i[0], i[1]) for i in r)]
         paises = dict((i[0], 0) for i in r)
         def pSum(p, n):
             paises[p] += n
             return paises[p]
-        paises = dict((p, {'data':u', '.join(u'{{x:{},y:{}}}'.format(i[1], pSum(p, i[2])) for i in r if i[0] == p and i[1] >= 1398816000)}) for p in paises)
+        paises = dict((p, {'endtime': p in endtime and endtime[p] or 'false',
+            'data':u', '.join(u'{{x:{},y:{}}}'.format(i[1], pSum(p, i[2])) for i in sorted(r) if i[0] == p and i[1] >= 1398902400)}) for p in paises)
         c.execute(u'''SELECT
  SUBSTR(cl_to, 38) país,
  SUM(img_name IN (SELECT DISTINCT gil_to FROM globalimagelinks)) use_in_wiki
@@ -161,8 +193,8 @@ def main(name=None):
         r = dict((i[0].decode('utf-8').replace(u'_', u' '), u'[{},{}]'.format(int(i[1]), int(i[2]))) for i in c.fetchall())
         for p in paises:
             paises[p]['users'] = r[p]
-        query = u',\n  '.join(u'{{name:"{name}", usage:{usage}, users:{users}, data:[{data}]}}'.format(name=p.replace(u'the ', u''), **paises[p]) for p in paises)
-        return render_template_string(page, title=u'Wiki Loves Earth 2014', query=query)
+        query = u',\n  '.join(u'{{name:"{name}", usage:{usage}, users:{users}, endtime:"{endtime}", data:[{data}]}}'.format(name=p, **paises[p]) for p in paises)
+        return render_template_string(page, title=u'Wiki Loves Earth 2014', query=query, now=int(time()))
     elif c:
         name = name.replace(u'Netherlands', u'the_Netherlands')
         c.execute(u'''SELECT

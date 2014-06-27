@@ -193,7 +193,20 @@ page = u'''
 {{ error |safe }}{% endblock %}
 '''
 
+nouserpage = u'''{% extends "base.html" %}
+{% block content %}
+<table style="margin: 4em auto 15em auto;">
+  <tr>
+    <td>Usuário:</td>
+    <td><input id="user" type="text" onkeypress="return enter(event, this, 'Usuário:')"/></td>
+  </tr>
+</table>
+{% endblock %}
+'''
+
 def main(user=None):
+    if not user:
+        return render_template_string(nouserpage, title=u'Edições e grupos de usuários')
     # 'nome da wiki no banco de dados': (tempo-voto, edições-voto, tempo-administrador, edições-administrador, outro-nome, outro-tempo, outro-edições)
     ptwikis = {'ptwiki': (90, 300, 182, 2000, 'eliminador', 182, 1000),
                'ptwikibooks': (30, 50),

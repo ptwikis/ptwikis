@@ -19,7 +19,7 @@ page = u'''
 <div id="iph"></div>
 <br/><br/><p>Gráfico para os últimos 30 dias:</p>
 <div id="ipd"></div>
-{% if wiki == "Wikipédia" %}<p>* As reversões são obtidas pelo sumário da edição ("Foram [[WP:REV|..." e "Reversão de uma ou mais edições de..."), o número não é totalmente preciso.</p>{% endif %}
+{% if wiki == "Wikipédia" %}<p>* As reversões são obtidas pelo sumário da edição ("Foram [[WP:REV|...", "Reversão de uma ou mais edições de..." e "bot: revertidas edições de..."), o número não é totalmente preciso.</p>{% endif %}
 
 <script>
 
@@ -169,24 +169,24 @@ def main(wiki=None):
     if c:
         c.execute('''SELECT
  SUBSTR(rc_timestamp, 1, 10) AS HORA,
- SUM(CASE WHEN rc_user = 0 THEN 1 ELSE 0 END),
- SUM(CASE WHEN rc_user = 0 THEN rc_patrolled ELSE 0 END),
- SUM(CASE WHEN rc_comment LIKE ? OR rc_comment LIKE ? OR rc_comment LIKE ? THEN 1 ELSE 0 END)
+ SUM(rc_user = 0),
+ SUM(rc_user = 0 AND rc_patrolled),
+ SUM(rc_comment LIKE ? OR rc_comment LIKE ? OR rc_comment LIKE ?)
  FROM recentchanges
  WHERE rc_namespace = 0 AND rc_type != 5
  GROUP BY HORA
  ORDER BY rc_id DESC
- LIMIT 168''', ('[[WP:REV|%', 'Foram [[WP:REV|%', u'Reversão de uma ou mais edições de%'))
+ LIMIT 168''', ('Foram [[WP:REV|%', u'Reversão de uma ou mais edições de%', u'bot: revertidas edições de%'))
         r1 = c.fetchall()
         c.execute('''SELECT
  SUBSTR(rc_timestamp, 1, 8) AS DIA,
- SUM(CASE WHEN rc_user = 0 THEN 1 ELSE 0 END),
- SUM(CASE WHEN rc_user = 0 THEN rc_patrolled ELSE 0 END),
- SUM(CASE WHEN rc_comment LIKE ? OR rc_comment LIKE ? THEN 1 ELSE 0 END)
+ SUM(rc_user = 0),
+ SUM(rc_user = 0 AND rc_patrolled),
+ SUM(rc_comment LIKE ? OR rc_comment LIKE ? OR rc_comment LIKE ?)
  FROM recentchanges
  WHERE rc_namespace = 0 AND rc_type != 5
  GROUP BY DIA
- ORDER BY rc_id DESC''', ('Foram [[WP:REV|%', u'Reversão de uma ou mais edições de%'))
+ ORDER BY rc_id DESC''', ('Foram [[WP:REV|%', u'Reversão de uma ou mais edições de%', u'bot: revertidas edições de%'))
         r2 = c.fetchall()
         r = {'wiki': wiki, 'link': link(wiki)}
 	r['iphquery'] = ','.join([(x in r1[6::6] and '\n[{},{},{},{}]' or '[{},{},{},{}]').format(*x) for x in r1])

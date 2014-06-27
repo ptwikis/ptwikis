@@ -113,7 +113,7 @@ var hoverDetailh = new Rickshaw.Graph.HoverDetail( {
 ## Gráfico de barra de todos filtros
 allfilters = u'''{% extends "base.html" %}
 {% block head %}
-        <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <style>.selected td {background-color: #FFE}</style>
         <script>
 var filters = [];
@@ -253,7 +253,7 @@ def main(args=None):
               else:
                 filters[f].append(map(int, l))
 	    c.execute('SELECT af_public_comments FROM abuse_filter WHERE af_id = ?', (f,))
-	    names[f] = 'Filtro ' + f + u' – ' + c.fetchone()[0].decode('utf-8')
+	    names[f] = 'Filtro ' + f + u' – ' + c.fetchone()[0].decode('utf-8').replace(u'"', u'\\"')
         title = len(filter) == 1 and names[filter[0]] or ' + '.join(['Filtro ' + f for f in filter])
 	r = {'wiki': wiki, 'link': link(wiki), 'filters': filters, 'names': names}
 	return render_template_string(filtergraph, title=title, **r)

@@ -38,7 +38,9 @@ function listar(nome) {
 {% if query %}
 <table class="lista">{% for item in query %}
 <tr><td>{%if not user %}<a class="ext" href="https://pt.wikipedia.org/wiki/{{ item[0] }}">{{ item[0]|replace('_', ' ') }}</a> (<a class="ext" href="https://pt.wikipedia.org/w/index.php?title={{ item[0] }}&action=history">hist</a>){% else %}<a class= "ext" href="https://pt.wikipedia.org/wiki/Especial:Contribui%C3%A7%C3%B5es/{{ item[0] }}">{{ item[0]|replace('_', ' ') }}{% endif %}</td>{% for d in item[1:] %}<td>{{ d }}</td>{% endfor %}</tr>
-{% endfor %}</table>{% endif %}
+{% endfor %}</table>
+<p>*dados de visitas de maio de 2014</p>
+{%- endif %}
 <p>{{ aviso }}</p>
 {% endblock %}'''
 
@@ -50,15 +52,15 @@ def main(args=None):
   # Se não for página especial
   if u':' in args[0]:
     params = {}
-    ordens = {u'mais_visitas': 'vi_mes DESC, page_len DESC',
-              u'menos_visitas': 'vi_mes, page_len DESC',
-	      u'maior_tamanho': 'page_len DESC, vi_mes DESC',
-	      u'menor_tamanho': 'page_len, vi_mes DESC'}
+    ordens = {u'mais_visitas': 'ac_201405 DESC, page_len DESC',
+              u'menos_visitas': 'ac_201405, page_len DESC',
+	      u'maior_tamanho': 'page_len DESC, ac_201405 DESC',
+	      u'menor_tamanho': 'page_len, ac_201405 DESC'}
     for arg in args:
       if arg.startswith(u'cat:'):
-	params['cat' in params and 'cat2' or 'cat'] = arg[4:].capitalize()
+	params['cat' in params and 'cat2' or 'cat'] = arg[4].upper() + arg[5:]
       elif arg.startswith(u'predef:'):
-	params['predef' in params and 'predef2' or 'predef'] = arg[7:].capitalize()
+	params['predef' in params and 'predef2' or 'predef'] = arg[7].upper() + arg[8:].capitalize()
       elif arg.startswith(u'marca:'):
 	params['marca' in params and 'marca2' or 'marca'] = arg[6:]
       elif arg.startswith(u'ordenar:'):
@@ -80,13 +82,13 @@ def main(args=None):
         marca2, filtro2, textofiltro = u'', u'', ()
         title = u'Lista de páginas com marca sobre ' + params['marca'].replace(u'_', u' ')
       c = conn('p50380g50592__pt', 's2.labsdb')
-      c.execute(u"""SELECT a.page_namespace, a.page_title, vi_mes, a.page_len
+      c.execute(u"""SELECT a.page_namespace, a.page_title, ac_201405, a.page_len
  FROM ptwiki_p.categorylinks c
  {0}
  INNER JOIN ptwiki_p.page d ON c.cl_from = page_id
  INNER JOIN ptwiki_p.page a ON a.page_namespace = (d.page_namespace - 1) AND d.page_title = a.page_title
  {1}
- LEFT JOIN visitas ON a.page_id = vi_page
+ LEFT JOIN acessos ON a.page_id = ac_page AND ac_wiki = 'w'
  WHERE c.cl_to LIKE ?
  ORDER BY {2}
  LIMIT 200""".format(marca2, filtro2, ordenar), textofiltro + (u'!Artigos_de_importância_%_sobre_' + params['marca'],))
@@ -98,18 +100,18 @@ def main(args=None):
         filtro2, textofiltro = u"INNER JOIN ptwiki_p.templatelinks ON c.cl_from = tl_from AND tl_namespace = 10 AND tl_title = ?", (params['predef'],)
 	title = u'Lista de páginas com a categoria ' + params['cat'].replace(u'_', u' ') + u' e a predefinição ' + params['predef'].replace(u'_', u' ')
       if 'cat2' in params:
-        filtro2, textofiltro = u"INNER JOIN ptwiki_p.categorylinks cc ON c.cl_from = cc.cl_from AND cl_to = ?", (params['cat'],)
+        filtro2, textofiltro = u"INNER JOIN ptwiki_p.categorylinks cc ON c.cl_from = cc.cl_from AND cc.cl_to = ?", (params['cat'],)
 	title = u'Lista de páginas com a categoria ' + params['cat'].replace(u'_', u' ') + u' e a categoria ' + params['cat'].replace(u'_', u' ')
       else:
         filtro2, textofiltro = u'', ()
 	title = u'Lista de páginas com a categoria ' + params['cat'].replace(u'_', u' ')
       c = conn('p50380g50592__pt', 's2.labsdb')
-      c.execute(u"""SELECT page_namespace, page_title, vi_mes, page_len
+      c.execute(u"""SELECT page_namespace, page_title, ac_201405, page_len
  FROM ptwiki_p.categorylinks c
  {0}
  INNER JOIN ptwiki_p.page ON c.cl_from = page_id
- LEFT JOIN visitas ON page_id = vi_page
- WHERE cl_to = ? AND c.cl_type = 'page'
+ LEFT JOIN acessos ON page_id = ac_page AND ac_wiki = 'w'
+ WHERE c.cl_to = ? AND c.cl_type = 'page'
  ORDER BY {1}
  LIMIT 200""".format(filtro2, ordenar), textofiltro + (params['cat'],))
       r = c.fetchall()
@@ -123,11 +125,11 @@ def main(args=None):
         predef2, textopredef2 = u'', ()
         title = u'Lista de páginas com a predefinição ' + params['predef'].replace(u'_', u' ')
       c = conn('p50380g50592__pt', 's2.labsdb')
-      c.execute(u"""SELECT page_namespace, page_title, vi_mes, page_len
+      c.execute(u"""SELECT page_namespace, page_title, ac_201405, page_len
  FROM ptwiki_p.templatelinks a
  {0}
  INNER JOIN ptwiki_p.page ON a.tl_from = page_id
- LEFT JOIN visitas ON page_id = vi_page
+ LEFT JOIN acessos ON page_id = ac_page AND ac_wiki = 'w'
  WHERE a.tl_namespace = 10 AND a.tl_title = ?
  ORDER BY {1}
  LIMIT 200""".format(predef2, ordenar), (predef2 and (params['predef2'],) or ()) + (params['predef'],))
