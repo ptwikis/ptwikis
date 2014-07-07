@@ -145,7 +145,16 @@ def main(args=None):
   # Páginas com mais reversões
   elif args[0] == u'Páginas_com_mais_reversões':
     c = conn('ptwiki')
-    c.execute(u"SELECT rc_namespace, rc_title, SUM(rc_comment LIKE '[[WP:REV|%' OR rc_comment LIKE 'Foram [[WP:REV|%' OR rc_comment LIKE 'bot: revertidas edições de%' OR rc_comment LIKE 'Reversão de uma ou mais edições de%') rev FROM recentchanges WHERE TIMESTAMPDIFF(DAY, rc_timestamp, CURDATE()) <= 10 GROUP BY rc_namespace, rc_title HAVING rev > 0 ORDER BY rev DESC LIMIT 100")
+    c.execute(u"""SELECT
+ rc_namespace,
+ rc_title,
+ SUM(rc_comment LIKE 'Foram [[WP:REV|%' OR rc_comment LIKE 'bot: revertidas edições de%' OR rc_comment LIKE 'Reversão de uma ou mais edições de%') rev
+ FROM recentchanges
+ WHERE TIMESTAMPDIFF(DAY, rc_timestamp, CURDATE()) <= 10
+ GROUP BY rc_namespace, rc_title
+ HAVING rev > 0
+ ORDER BY rev DESC
+ LIMIT 100""")
     r = c.fetchall()
     r = [((i[0] in ns and ns[i[0]] or u'') + i[1].decode('utf-8'), u'{} reversões'.format(i[2])) for i in r]
     return render_template_string(page, title=u'Lista das páginas com mais reversões nos últimos 10 dias', query=r)
@@ -155,7 +164,12 @@ def main(args=None):
     import re
     user = re.compile(r'pecial:Contrib.+?/(.+?)\|')
     c = conn('ptwiki')
-    c.execute(u"SELECT SUBSTR(rc_comment, 1, 100) user, COUNT(*) FROM recentchanges WHERE TIMESTAMPDIFF(DAY, rc_timestamp, CURDATE()) <= 5 AND rc_type = 0 AND (rc_comment LIKE '[[WP:REV|%' OR rc_comment LIKE 'bot: revertidas edições de%' OR rc_comment LIKE 'Foram [[WP:REV|%' OR rc_comment LIKE 'Reversão de uma ou mais edições de%') GROUP BY user")
+    c.execute(u"""SELECT
+ SUBSTR(rc_comment, 1, 100) user,
+ COUNT(*)
+ FROM recentchanges
+ WHERE TIMESTAMPDIFF(DAY, rc_timestamp, CURDATE()) <= 5 AND rc_type = 0 AND (rc_comment LIKE 'bot: revertidas edições de%' OR rc_comment LIKE 'Foram [[WP:REV|%' OR rc_comment LIKE 'Reversão de uma ou mais edições de%')
+ GROUP BY user""")
     r = c.fetchall()
     r = [(user.search(i[0]), int(i[1])) for i in r if ':CITE|' not in i[0]]
     r = [(i[0].group(1).decode('utf-8'), i[1]) for i in r if i[0]]
@@ -163,10 +177,18 @@ def main(args=None):
     for i in r:
       r2[i[0]] = i[0] in r2 and r2[i[0]] + i[1] or i[1]
     r = sorted(r2.items(), key=lambda i:i[1], reverse=True)[0:70]
-    c.execute(u"SELECT afl_user_text user, COUNT(*) FROM abuse_filter_log WHERE TIMESTAMPDIFF(DAY, afl_timestamp, CURDATE()) <= 5 AND afl_user_text IN ({}) GROUP BY user".format(u','.join(u'?' * len(r))), tuple(i[0] for i in r))
+    c.execute(u"""SELECT
+ afl_user_text user,
+ COUNT(*)
+ FROM abuse_filter_log
+ WHERE TIMESTAMPDIFF(DAY, afl_timestamp, CURDATE()) <= 5 AND afl_user_text IN ({})
+ GROUP BY user""".format(u','.join(u'?' * len(r))), tuple(i[0] for i in r))
     r2 = c.fetchall()
     r2 = dict((i[0].decode('utf-8'), int(i[1])) for i in r2)
-    c.execute(u"SELECT ipb_address FROM ipblocks WHERE ipb_address IN ({}) AND (ipb_expiry = 'ininity' OR ipb_expiry > DATE_FORMAT(NOW(), '%Y%m%d%H%i%S'))".format(u','.join(u'?' * len(r))), tuple(i[0] for i in r))
+    c.execute(u"""SELECT
+ ipb_address
+ FROM ipblocks
+ WHERE ipb_address IN ({}) AND (ipb_expiry = 'ininity' OR ipb_expiry > DATE_FORMAT(NOW(), '%Y%m%d%H%i%S'))""".format(u','.join(u'?' * len(r))), tuple(i[0] for i in r))
     r3 = [i[0].decode('utf-8') for i in c.fetchall()]
     r = [(i[0], u'revertido {} vezes'.format(i[1]), i[0] in r2 and u'disparou filtros {} {}'.format(r2[i[0]], r2[i[0]] == 1 and u'vez' or u'vezes') or u'', i[0] in r3 and u'Bloqueado' or u'') for i in r]
     return render_template_string(page, title=u'Lista dos usuários mais revertidos nos últimos 5 dias', query=r, user=True)

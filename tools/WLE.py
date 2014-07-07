@@ -8,7 +8,7 @@ page = u'''
 {% extends "Tools.html" %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='rickshaw/rickshaw.min.css') }}">
-<script src="{{ url_for('static', filename='rickshaw/vendor/d3.min.js') }}"></script>
+<script src="{{ url_for('static', filename='rickshaw/vendor/d3.v3.js') }}"></script>
 <script src="{{ url_for('static', filename='rickshaw/rickshaw.min.js') }}"></script>
 
 <style>
@@ -148,20 +148,23 @@ def main(name=None):
  UNIX_TIMESTAMP(SUBSTR(img_timestamp, 1, 8)) dia,
  SUBSTR(img_timestamp, 1, 10) hora,
  COUNT(*) upload
- FROM categorylinks INNER JOIN page ON cl_from = page_id INNER JOIN image ON page_title = img_name
+ FROM categorylinks
+ INNER JOIN page ON cl_from = page_id
+ INNER JOIN image ON page_title = img_name AND img_timestamp < 20140801000000
  WHERE cl_type = 'file' AND cl_to IN (SELECT
    page_title
    FROM page
-   WHERE page_namespace = 14 AND page_title LIKE 'Images_from_Wiki_Loves_Earth_2014_in_%' AND page_title NOT LIKE '%\_-\_%')
+   WHERE page_namespace = 14 AND page_title LIKE 'Images_from_Wiki_Loves_Earth_2014_in_%' AND page_title NOT LIKE '%\_-\_%'
+ )
  GROUP BY país, hora''')
         r = [(i[0].decode('utf-8').replace(u'_', u' '), int(i[1]) + 86400, int(i[2]), int(i[3])) for i in c.fetchall()]
-        r = [(i[0], i[1], i[3]) for i in r if i[0] not in endtime or i[2] <= endtime[i[0]]]
-        r = [(d[0], d[1], sum(h[2] for h in r if (h[0], h[1]) == d)) for d in set((i[0], i[1]) for i in r)]
+        r = [(i[0], i[1], i[3]) for i in r if i[0] not in endtime or i[2] <= endtime[i[0]]] # considera apenas até endtime
+        r = [(d[0], d[1], sum(h[2] for h in r if (h[0], h[1]) == d)) for d in set((i[0], i[1]) for i in r)] # agrupa por país e dia
         paises = dict((i[0], 0) for i in r)
         def pSum(p, n):
             paises[p] += n
             return paises[p]
-        paises = dict((p, {'endtime': p in endtime and endtime[p] or 'false',
+        paises = dict((p, {'endtime': p in endtime and endtime[p] or '2014080100',
             'data':u', '.join(u'{{x:{},y:{}}}'.format(i[1], pSum(p, i[2])) for i in sorted(r) if i[0] == p and i[1] >= 1398902400)}) for p in paises)
         c.execute(u'''SELECT
  SUBSTR(cl_to, 38) país,

@@ -26,14 +26,15 @@ function enter(e, textinput, prefix) {
 		<div id="menu">
 <img src="//upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Tool_labs_logo.svg/120px-Tool_labs_logo.svg.png">
                 <div id="menu-content">
-<div id="menu-item">{% if title == 'Ferramentas para projetos lusófonos'%}<b>Ferramentas</b>{% else %}<a href="./">Ferramentas</a>{% endif %}</div>
-<div id="menu-item"><a href="./Tools">Ferramentas globais</a></div>
+<div id="menu-item">{% if title == 'Ferramentas para projetos lusófonos'%}<b>Ferramentas</b>{% else %}<a href="/ptwikis/">Ferramentas</a>{% endif %}</div>
+<div id="menu-item"><a href="/ptwikis/Tools">Ferramentas globais</a></div>
 <div id="menu-item"><a href="//pt.wikipedia.org/wiki/Wikip%C3%A9dia:Ptwikis">Coordenação</a></div>
+<div id="menu-item"><a href="//pt.wikipedia.org/w/index.php?title=Wikipédia_Discussão:Ptwikis&action=edit&section=new&preloadtitle=Bug:%20________">Informe um erro</a></div>
                 </div>
             </div>
             <div id="content">
 <br/>
-<h1>{{ self.title() }}</h1>
+<h1>{{ self.title()|safe }}</h1>
 <hr/> Tool Labs – Ferramentas para projetos lusófonos <br/><br/>
 {% block content %}{{ content }}{% endblock %}
             </div>

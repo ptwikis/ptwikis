@@ -11,7 +11,7 @@ app.debug = True
 def index(page=None):
     return render_template('mainpage.html', title=u'Ferramentas para projetos lusófonos')
 
-@app.route(u'/<page>')
+@app.route(u'/<path:page>')
 def htmlpage(page=None):
     page = page.split(':', 1)
     html = (page[0] + u'.html').encode('utf8')

@@ -7,8 +7,8 @@ page = u'''
 {% extends "base.html" %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='rickshaw/rickshaw.min.css') }}">
-<script src="{{ url_for('static', filename='rickshaw/vendor/d3.min.js') }}"></script>
-<script src="{{ url_for('static', filename='rickshaw/rickshaw.min.js') }}"></script>
+<script src="{{ url_for('static', filename='rickshaw/vendor/d3.v3.js') }}"></script>
+<script src="{{ url_for('static', filename='rickshaw/rickshaw.js') }}"></script>
 
 <style> svg {box-shadow: 0 0 3px} </style>
 {% endblock %}
