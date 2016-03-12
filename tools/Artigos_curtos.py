@@ -48,7 +48,7 @@ def main(wiki=None):
    )
    AND page_len < 800
    ORDER BY page_len
-   LIMIT 100
+   LIMIT 500
  ) p
  LEFT JOIN revision ON page_latest = rev_id
  LEFT JOIN categorylinks ON page_id = cl_from AND cl_to NOT LIKE '!%'

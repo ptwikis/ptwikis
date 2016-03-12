@@ -13,7 +13,7 @@ grupos a que o usuário pertence e direito de se candidatar a administrador e el
   </tr>
 </table>
 
-<h3 style="display: block; margin-top: 1em;"><a href="Patrulhamento_de_IPs">Patrulhamento de IPs</a></h3>
+<h3 style="display: block; margin-top: 1em;"><a href="{{ url_for('.index') }}Patrulhamento_de_IPs">Patrulhamento de IPs</a></h3>
 <p>Gráfico das edições de IPs e edições de IPs patrulhadas por hora nos últimos 7 dias, e por dia nos últimos 30 dias.<br/>
 <select style="margin-top:1em; border:1px solid #A7D7F9; background-color:#F6F6F6" onchange="location.href = location.href.substring(0, location.href.lastIndexOf('/')) + '/Patrulhamento_de_IPs:' + this.value">
   <option value="">Escolha o projeto</option>
@@ -27,7 +27,7 @@ grupos a que o usuário pertence e direito de se candidatar a administrador e el
   <option>Wikivoyage</option>
 </select></p>
 
-<h3 style="display: block; margin-top: 1em;"><a href="Filtros">Filtros</a></h3>
+<h3 style="display: block; margin-top: 1em;"><a href="{{ url_for('.index') }}Filtros">Filtros</a></h3>
 <p>Gráfico dos registros de ações dos filtros nos últimos 30 dias.<br/>
 <select style="margin-top:1em; border:1px solid #A7D7F9; background-color:#F6F6F6" onchange="location.href = location.href.substring(0, location.href.lastIndexOf('/')) + '/Filtros:' + this.value">
   <option value="">Escolha o projeto</option>
@@ -41,7 +41,7 @@ grupos a que o usuário pertence e direito de se candidatar a administrador e el
   <option>Wikivoyage</option>
 </select></p>
 
-<h3 style="display: block; margin-top: 1em;"><a href="Editor_Visual">Editor Visual</a></h3>
+<h3 style="display: block; margin-top: 1em;"><a href="{{ url_for('.index') }}Editor_Visual">Editor Visual</a></h3>
 <p>Gráfico das edições usando o Editor Visual nos últimos 30 dias.<br/>
 <select style="margin-top:1em; border:1px solid #A7D7F9; background-color:#F6F6F6" onchange="location.href = location.href.substring(0, location.href.lastIndexOf('/')) + '/Editor_Visual:' + this.value">
   <option value="">Escolha o projeto</option>
@@ -55,31 +55,28 @@ grupos a que o usuário pertence e direito de se candidatar a administrador e el
   <option>Wikivoyage</option>
 </select></p>
 
-<h3 style="display: block; margin-top: 1em;"><a href="Linha_do_tempo">Linha do tempo</a></h3>
+<h3 style="display: block; margin-top: 1em;"><a href="{{ url_for('.index') }}Linha_do_tempo">Linha do tempo</a></h3>
 <p>Gráfico com vários dados e eventos da Wikipédia.</p>
 
-<h3 style="display: block; margin-top: 1em;"><a href="Interface_Movel">Interface móvel</a></h3>
+<h3 style="display: block; margin-top: 1em;"><a href="{{ url_for('.index') }}Interface_Movel">Interface móvel</a></h3>
 <p>Gráfico das edições feitas na Wikipédia por interface móvel.</p>
 
 <h3 style="display: block; margin-top: 1em;">Acessos</h3>
 <p>Gráfico dos acessos à Wikipédia. <b>Em Manutenção</b></p>
 
-<h3 style="display: block; margin-top: 1em;"><a href="Artigos_curtos">Artigos curtos</a></h3>
+<h3 style="display: block; margin-top: 1em;"><a href="{{ url_for('.index') }}Artigos_curtos">Artigos curtos</a></h3>
 <p>Lista dos menores artigos da Wikipédia, sem contar as desambiguações</p>
 
-<h3 style="display: block; margin-top: 1em;"><a href="Listas">Listas</a></h3>
+<h3 style="display: block; margin-top: 1em;"><a href="{{ url_for('.index') }}Listas">Listas</a></h3>
 <p>Lista de páginas utilizando diversos filtros</p>
 
-<h3 style="display: block; margin-top: 1em;"><a href="Matriz">Matrizes</a></h3>
+<h3 style="display: block; margin-top: 1em;"><a href="{{ url_for('.index') }}Matriz">Matrizes</a></h3>
 <p>Matrizes de classificação de qualidade e importância</p>
 
 <h2>Ferramentas Globais</h2><hr>
-<h3 style="display: block; margin-top: 1em;"><a href="common-iw">Artigos sem interwiki</a></h3>
+<h3 style="display: block; margin-top: 1em;"><a href="{{ url_for('.index') }}common-iw">Artigos sem interwiki</a></h3>
 <p>Lista artigos que existem na Wikipédia em inglês sem interwiki para um determinado idioma, ordenados pelo número de interwikis existentes.</p>
 <p>Prefixo do idioma: <input id="user" type="text" text="pt" size=2 onkeypress="return enter(event, this, 'common-iw:')"/></p>
-
-<h3 style="display: block; margin-top: 1em;"><a href="WLE">Wiki Loves Earth 2014</a></h3>
-<p>Gráfico de envios de arquivo na campanha Wiki Loves Earth 2014.</p>
 
 {% endblock %}
 

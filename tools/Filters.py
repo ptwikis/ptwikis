@@ -4,7 +4,7 @@ from flask import render_template_string
 from database import conn, link
 
 # Gráfico das ações de um ou mais filtros no tempo
-filtergraph = u'''{% extends "base.html" %}
+filtergraph = u'''{% extends "Tools.html" %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='rickshaw/rickshaw.min.css') }}">
 <script src="{{ url_for('static', filename='rickshaw/vendor/d3.min.js') }}"></script>

@@ -31,7 +31,7 @@ def htmlpage(page=None):
 
 @app.errorhandler(404)
 def page_not_found(error):
-    return render_template('page_not_found.html', title=u'Página não encontrada'), 404
+    return render_template('page_not_found.html', title=u'Página não encontrada', url=request.url), 404
 
 if __name__ == '__main__':
     from flup.server.fcgi_fork import WSGIServer

@@ -39,10 +39,13 @@ function listar(nome) {
 <table class="lista">{% for item in query %}
 <tr><td>{%if not user %}<a class="ext" href="https://pt.wikipedia.org/wiki/{{ item[0] }}">{{ item[0]|replace('_', ' ') }}</a> (<a class="ext" href="https://pt.wikipedia.org/w/index.php?title={{ item[0] }}&action=history">hist</a>){% else %}<a class= "ext" href="https://pt.wikipedia.org/wiki/Especial:Contribui%C3%A7%C3%B5es/{{ item[0] }}">{{ item[0]|replace('_', ' ') }}{% endif %}</td>{% for d in item[1:] %}<td>{{ d }}</td>{% endfor %}</tr>
 {% endfor %}</table>
-<p>*dados de visitas de maio de 2014</p>
+<p>*dados de visitas de {{ mes }}</p>
 {%- endif %}
 <p>{{ aviso }}</p>
 {% endblock %}'''
+
+meses = {'01': u'janeiro', '02': u'fevereiro', '03': u'março', '04': u'abril', '05': u'maio', '06': u'junho',
+  '07': u'julho', '08': u'agosto', '09': u'setembro', '10': u'outubro', '11': u'novembro', '12': u'dezembro'}
 
 def main(args=None):
   if not args:
@@ -51,6 +54,10 @@ def main(args=None):
 
   # Se não for página especial
   if u':' in args[0]:
+    
+    c = conn('p50380g50592__pt', 's2.labsdb')
+    c.execute('DESC acessos')
+    mes = c.fetchall()[-1][0]
     params = {}
     ordens = {u'mais_visitas': 'ac_201405 DESC, page_len DESC',
               u'menos_visitas': 'ac_201405, page_len DESC',
@@ -82,16 +89,16 @@ def main(args=None):
         marca2, filtro2, textofiltro = u'', u'', ()
         title = u'Lista de páginas com marca sobre ' + params['marca'].replace(u'_', u' ')
       c = conn('p50380g50592__pt', 's2.labsdb')
-      c.execute(u"""SELECT a.page_namespace, a.page_title, ac_201405, a.page_len
+      c.execute(u"""SELECT a.page_namespace, a.page_title, {mes}, a.page_len
  FROM ptwiki_p.categorylinks c
  {0}
  INNER JOIN ptwiki_p.page d ON c.cl_from = page_id
  INNER JOIN ptwiki_p.page a ON a.page_namespace = (d.page_namespace - 1) AND d.page_title = a.page_title
  {1}
  LEFT JOIN acessos ON a.page_id = ac_page AND ac_wiki = 'w'
- WHERE c.cl_to LIKE ?
+ WHERE NOT page_is_redirect AND c.cl_to LIKE ?
  ORDER BY {2}
- LIMIT 200""".format(marca2, filtro2, ordenar), textofiltro + (u'!Artigos_de_importância_%_sobre_' + params['marca'],))
+ LIMIT 200""".format(marca2, filtro2, ordenar, mes=mes), textofiltro + (u'!Artigos_de_importância_%_sobre_' + params['marca'],))
       r = c.fetchall()
       r = [((i[0] in ns and ns[i[0]] or u'') + i[1].decode('utf-8'), u'{} visita{}'.format(i[2] or u'Nenhuma', i[2] and i[2] > 0 and u's' or u''), u'{} bytes'.format(i[3])) for i in r]
     # Categoria nos parâmetros
@@ -106,14 +113,14 @@ def main(args=None):
         filtro2, textofiltro = u'', ()
 	title = u'Lista de páginas com a categoria ' + params['cat'].replace(u'_', u' ')
       c = conn('p50380g50592__pt', 's2.labsdb')
-      c.execute(u"""SELECT page_namespace, page_title, ac_201405, page_len
+      c.execute(u"""SELECT page_namespace, page_title, {mes}, page_len
  FROM ptwiki_p.categorylinks c
  {0}
  INNER JOIN ptwiki_p.page ON c.cl_from = page_id
  LEFT JOIN acessos ON page_id = ac_page AND ac_wiki = 'w'
- WHERE c.cl_to = ? AND c.cl_type = 'page'
+ WHERE NOT page_is_redirect AND c.cl_to = ? AND c.cl_type = 'page'
  ORDER BY {1}
- LIMIT 200""".format(filtro2, ordenar), textofiltro + (params['cat'],))
+ LIMIT 200""".format(filtro2, ordenar, mes=mes), textofiltro + (params['cat'],))
       r = c.fetchall()
       r = [((i[0] in ns and ns[i[0]] or u'') + i[1].decode('utf-8'), u'{} visita{}'.format(i[2] or u'Nenhuma', i[2] and i[2] > 0 and u's' or u''), u'{} bytes'.format(i[3])) for i in r]
     # Predefinição nos parâmetros
@@ -125,20 +132,20 @@ def main(args=None):
         predef2, textopredef2 = u'', ()
         title = u'Lista de páginas com a predefinição ' + params['predef'].replace(u'_', u' ')
       c = conn('p50380g50592__pt', 's2.labsdb')
-      c.execute(u"""SELECT page_namespace, page_title, ac_201405, page_len
+      c.execute(u"""SELECT page_namespace, page_title, {mes}, page_len
  FROM ptwiki_p.templatelinks a
  {0}
  INNER JOIN ptwiki_p.page ON a.tl_from = page_id
  LEFT JOIN acessos ON page_id = ac_page AND ac_wiki = 'w'
- WHERE a.tl_namespace = 10 AND a.tl_title = ?
+ WHERE NOT page_is_redirect AND a.tl_namespace = 10 AND a.tl_title = ?
  ORDER BY {1}
- LIMIT 200""".format(predef2, ordenar), (predef2 and (params['predef2'],) or ()) + (params['predef'],))
+ LIMIT 200""".format(predef2, ordenar, mes=mes), (predef2 and (params['predef2'],) or ()) + (params['predef'],))
       r = c.fetchall()
       r = [((i[0] in ns and ns[i[0]] or u'') + i[1].decode('utf-8'), u'{} visita{}'.format(i[2] or u'Nenhuma', i[2] and i[2] > 0 and u's' or u''), u'{} bytes'.format(i[3])) for i in r]
     if r:
       if 'ordenar' in params and params['ordenar'] in (u'maior_tamanho', u'menor_tamanho'):
 	r = [(i[0], i[2], i[1]) for i in r]
-      return render_template_string(page, title=title, query=r)
+      return render_template_string(page, title=title, query=r, mes=u'{} de {}'.format(meses[mes[7:]], mes[3:7]))
     else:
       return render_template_string(page, title=title, aviso=u'<span style="color:#555555"><b>Nenhuma página com esses parâmetros</b></span>')
 

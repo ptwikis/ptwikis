@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block head %}
+
+  <title>Utilização de Recursos Educacionais nos projetos Wikimedia</title>
+
+
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="static/rea/reanovo.js"></script>
+	<script src="static/rea/rea.js"></script>
+
+{% endblock %}
+
+{% block content %}
+
+<p><b>Essa ferramenta lista páginas no Wikimedia Commons e nos Wikisources que utilizam recursos do domínio pesquisado.</b></p>
+
+
+<p>Como não existe uma forma estrutura de referenciar fontes no Commons e nos Wikisources, essa página soma links externos para os repositórios de recursos educacionais a partir de projetos Wikimedia. Para o Commons são somadas imagens com links para as bases (namespace=6), enquanto no Wikisource são somandas páginas do domínio principal (namespace=0). Em ambos os casos são pesquisadas referências utilizando tanto o domínio http como https. Para ver a lista completa de páginas utilizando o recurso em cada projeto clique no link com o nome do protocolo desejado.</p>
+<br>
+<br>
+
+<p><small><i><a href='javascript:mapeamentoREA()'>Clique aqui</a> para carregar a lista de repositórios pesquisados pelo <a href='https://pt.wikiversity.org/wiki/Mapeamento_REA_%28Brazil_Program%29'>Mapeamento REA</a>.</i></small></p>
+<br><br>
+
+
+<div id="tabela" class="section">
+
+</div>
+
+<div id="form" class="section">
+<a name="formulario"></a>
+<form name="newsearch" id ="newSearch" action="" method="GET">
+<b>Buscar dados de outros repositórios</b><br>
+Domínio do Repositório: <input type="text" id="dom" name="domain" placeholder="ex: gutenberg.org"><br>
+Idioma do Wikisource: <input type="text" id="lang" name="language" placeholder="ex: pt" size="2"><br>
+<input type="button" name="button" Value="Buscar" onClick="newSearch(this.form)">
+</form>
+</div>
+
+<div id="tabela2" class="section">
+</div>
+
+<script>
+function getURLParameter(name) {
+  return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
+}
+
+if (getURLParameter('language')){
+ document.getElementById("lang").value = getURLParameter('language');
+}
+
+if (getURLParameter('domain')){
+ document.getElementById("dom").value = getURLParameter('domain');
+}
+
+if (getURLParameter('rea')){
+ mapeamentoREA();
+} else if (getURLParameter('language') && getURLParameter('domain')){
+   var param = {
+     language : { value : getURLParameter('language') },
+     domain : { value : getURLParameter('domain') }
+   };
+  newSearch(param);
+}
+
+
+</script>
+
+{% endblock %}
+
+

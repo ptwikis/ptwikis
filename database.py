@@ -87,7 +87,7 @@ def visualeditor(wiki=None):
  FROM recentchanges
  INNER JOIN tag_summary
  ON rc_id = ts_rc_id
- WHERE ts_tags = 'visualeditor'
+ WHERE ts_tags LIKE '%visualeditor%'
  GROUP BY DIA
  ORDER BY rc_id DESC''')
         r = c.fetchall()
@@ -108,7 +108,7 @@ def interfacemovel(wiki=None):
  FROM recentchanges
  INNER JOIN tag_summary
  ON rc_id = ts_rc_id
- WHERE ts_tags = 'mobile edit'
+ WHERE ts_tags LIKE '%mobile edit%'
  GROUP BY DIA
  ORDER BY rc_id DESC''')
         r = c.fetchall()
