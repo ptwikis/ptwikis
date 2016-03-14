@@ -5,8 +5,8 @@
 
 	<title>{% block title %}{{ title }}{% endblock %}</title>
 
-        <link rel="icon" type="image/x-icon" href="/ptwikis/static/Tool_labs_logo.ico" />
-        <link rel="stylesheet" type="text/css" media="screen" href="/ptwikis/static/style.css" />
+	<link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='Tool_labs_logo.ico') }}" />
+	<link rel="stylesheet" type="text/css" media="screen" href="{{ url_for('static', filename='style.css') }}" />
 {% block head %}
         <script>
 

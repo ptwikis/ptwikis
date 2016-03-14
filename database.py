@@ -44,6 +44,9 @@ def template(page, arg):
         return {}
 
 def conn(db, host=None):
+    if not os.uname()[1].startswith('tools-webgrid'):
+        # Não tentar acessar o bd fora do Labs
+        return False
     wikis = {u'Wikipédia': 'ptwiki', u'Wikilivros': 'ptwikibooks', u'Wikiversidade': 'ptwikiversity', u'Wikcionário': 'ptwiktionary', u'Wikinotícias': 'ptwikinews',
              u'Wikiquote': 'ptwikiquote', u'Wikisource': 'ptwikisource', u'Wikivoyage': 'ptwikivoyage'}
     try:

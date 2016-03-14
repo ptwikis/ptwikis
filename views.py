@@ -34,6 +34,9 @@ def page_not_found(error):
     return render_template('page_not_found.html', title=u'Página não encontrada', url=request.url), 404
 
 if __name__ == '__main__':
-    from flup.server.fcgi_fork import WSGIServer
-    WSGIServer(app).run()
-    #app.debug = True; app.run()  # Utilize esta linha e comente as duas acima para rodar localmente
+    if os.uname()[1].startswith('tools-webgrid'):
+        from flup.server.fcgi_fork import WSGIServer
+        WSGIServer(app).run()
+    else:
+        # Roda a aplicação fora do Labs
+        app.run()
