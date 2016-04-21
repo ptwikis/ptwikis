@@ -14,7 +14,7 @@ function enter(e, textinput, prefix) {
     if (e.keyCode == 13) {
 	var value = textinput.value.replace(/ /g, "_");
 	value = value.charAt(0).toUpperCase() + value.slice(1);
-        location.href = location.href.substring(0, location.href.lastIndexOf("/") + 1) + prefix + value;
+        location.href = "{{ url_for('index') }}" + prefix + value;
         return false;
     }
 }
@@ -43,7 +43,7 @@ function enter(e, textinput, prefix) {
 Feito com <a href="http://flask.pocoo.org/">Flask</a>
        </div>
        <div style="text-align:center; font-size:x-small; margin: 10px 10px 12px 181px">
-O <a href="https://bitbucket.org/danilomac/ptwikis/src">código-fonte</a> desta página é disponibilizado sob a licença GNU General Public License 3.0 (GPL V3).
+O <a href="https://github.com/ptwikis/ptwikis">código-fonte</a> desta página é disponibilizado sob a licença GNU General Public License 3.0 (GPL V3).
        </div>
     </body>
 </html>
