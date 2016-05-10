@@ -121,7 +121,6 @@ function enter(e) {
 <a class="ext" href="//pt.wikipedia.org/wiki/Discussão:{{ item[0] }}">disc</a>)</td>
  {%- for d in item[1:] %}<td>{{ d }}</td>{% endfor %}</tr>
 {% endfor %}</table>
-<p><small>Nota: os dados de visitas são de maio de 2014</small></p>
 {%- endif %}
 <p>{{ aviso }}</p>
 {% endblock %}'''
@@ -188,7 +187,7 @@ def main(args=None):
     catq = u'!Artigos_{}_sobre_{}'.format(args[1][0] == u'5' and u'bons' or args[1][0] ==  u'6' and u'destacados' or
       u'de_qualidade_' + (args[1][0] == u'0' and u'desconhecida' or str(args[1][0])), args[0])
     cati = u'!Artigos_de_importância_{}_sobre_{}'.format(args[1][2] == u'0' and u'desconhecida' or args[1][2], args[0])
-    c.execute(u"""SELECT page_namespace, page_title, ac_201405, page_len
+    c.execute(u"""SELECT page_namespace, page_title, page_len
  FROM (SELECT
    page_namespace ns, page_title title
    FROM categorylinks cq
@@ -198,12 +197,10 @@ def main(args=None):
    LIMIT 200
  ) talks
  INNER JOIN page ON page_namespace = (ns - (ns % 2)) AND page_title = title
- LEFT JOIN p50380g50592__pt.acessos ON page_id = ac_page AND ac_wiki = 'w'
- ORDER BY ac_201405 DESC
+ ORDER BY page_len DESC
  LIMIT 200""", (catq, cati))
     r = c.fetchall()
-    r = [((i[0] in ns and ns[i[0]] or u'') + i[1].decode('utf-8'), u'{} visita{}'.format(i[2] or u'Nenhuma', i[2] and i[2] > 0 and u's' or u''),
-      u'{} bytes'.format(i[3])) for i in r]
+    r = [((i[0] in ns and ns[i[0]] or u'') + i[1].decode('utf-8'), u'{} bytes'.format(i[2])) for i in r]
     if not r:
       aviso = u'Não foram encontrados artigos com essa qualidade e importância.'
   else:
