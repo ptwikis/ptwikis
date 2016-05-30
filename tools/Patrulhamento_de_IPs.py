@@ -186,7 +186,8 @@ def main(wiki=None):
  FROM recentchanges
  WHERE rc_namespace = 0 AND rc_type != 5
  GROUP BY DIA
- ORDER BY rc_id DESC''', ('Foram [[WP:REV|%', u'Reversão de uma ou mais edições de%', u'bot: revertidas edições de%'))
+ ORDER BY rc_id DESC
+ LIMIT 30''', ('Foram [[WP:REV|%', u'Reversão de uma ou mais edições de%', u'bot: revertidas edições de%'))
         r2 = c.fetchall()
         r = {'wiki': wiki, 'link': link(wiki)}
 	r['iphquery'] = ','.join([(x in r1[6::6] and '\n[{},{},{},{}]' or '[{},{},{},{}]').format(*x) for x in r1])
