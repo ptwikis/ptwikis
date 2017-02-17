@@ -68,8 +68,11 @@ def diff(rev):
     global adlines    
     api = urlopen('https://pt.wikipedia.org/w/api.php?action=query&format=json&prop=revisions&revids=%d&rvprop=content|ids' % int(rev))
     rev1 = json.loads(api.read())['query']['pages'].values()[0]['revisions'][0]
-    api = urlopen('https://pt.wikipedia.org/w/api.php?action=query&format=json&prop=revisions&revids=%d&rvprop=content' % rev1['parentid'])
-    rev0 = json.loads(api.read())['query']['pages'].values()[0]['revisions'][0]
+    if rev1.get('parentid'):
+      api = urlopen('https://pt.wikipedia.org/w/api.php?action=query&format=json&prop=revisions&revids=%d&rvprop=content' % rev1['parentid'])
+      rev0 = json.loads(api.read())['query']['pages'].values()[0]['revisions'][0]
+    else:
+      rev0 = {'*': ''}
     diff = ndiff(rev0['*'].splitlines(), rev1['*'].splitlines())
     adlines = u'\n'.join(l[2:] for l in diff if l.startswith('+'))
 
