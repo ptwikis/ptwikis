@@ -110,6 +110,8 @@ function enter(e) {
     <td>{{ qi[7]|sum }}</td>
   </tr>
 </table>
+<p><a href="https://pt.wikipedia.org/wiki/Wikip%C3%A9dia:%CE%A9">WikiEsforço</a>: {{
+ qi[5]|sum + qi[4]|sum * 2 +  qi[3]|sum * 3 +  qi[2]|sum * 4 +  qi[1]|sum * 5 }}</p>
 {%- endif %}
 {% if erro %}<p style="color:#a00; padding-left:60px">Erro: ainda não existem <a class="ext" href="//pt.wikipedia.org/wiki/Categoria:!Artigos_de_qualidade_1_sobre_{{ tema }}">artigos categorizados com o tema {{ tema|replace('_', ' ') }}</a>.</p>{% endif %}
 {%- if lista %}
