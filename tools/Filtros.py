@@ -113,7 +113,7 @@ var hoverDetailh = new Rickshaw.Graph.HoverDetail( {
 ## Gráfico de barra de todos filtros
 allfilters = u'''{% extends "base.html" %}
 {% block head %}
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="//tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <style>.selected td {background-color: #FFE}</style>
         <script>
 var filters = [];
