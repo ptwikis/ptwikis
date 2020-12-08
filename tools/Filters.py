@@ -201,7 +201,7 @@ function wikichoose(){
 function go(){
   var lang = document.getElementById('lang').value;
   var wiki = document.getElementById('wiki').value;
-  location.href = 'https://tools.wmflabs.org/ptwikis/Filters:' + lang + wiki;
+  location.href = 'https://ptwikis.toolforge.org/Filters:' + lang + wiki;
   return false;
 }
 </script>

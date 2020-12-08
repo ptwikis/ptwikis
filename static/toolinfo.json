@@ -3,7 +3,7 @@
     "name" : "ptwikis-abusefilter-graphs",
     "title": "Abuse Filter Graphs",
     "description" : "Graph showing the actions taken by filters in the last 30 days.",
-    "url" : "https://tools.wmflabs.org/ptwikis/Filters",
+    "url" : "https://ptwikis.toolforge.org/Filters",
     "keywords" : "graph, abusefilter, vandals, ptwikis",
     "author" : "Danilo.mac",
     "repository": "https://bitbucket.org/danilomac/ptwikis.git"
@@ -12,7 +12,7 @@
     "name" : "ptwikis-matrix",
     "title": "Classification Matrix",
     "description" : "Classify articles about a subject in a matrix, showing how many pages have a certain quality and priority",
-    "url" : "https://tools.wmflabs.org/ptwikis/Matriz",
+    "url" : "https://ptwikis.toolforge.org/Matriz",
     "keywords" : "table, quality, importance, priority, assessment, class, ptwikis",
     "author" : "Danilo.mac, Helder",
     "repository": "https://bitbucket.org/danilomac/ptwikis.git"
@@ -21,7 +21,7 @@
     "name" : "ptwikis-common-interwikis",
     "title": "Common interwiki articles",
     "description" : "List of articles that exists in the English Wikipedia without interwiki to a determined language.",
-    "url" : "https://tools.wmflabs.org/ptwikis/common-iw",
+    "url" : "https://ptwikis.toolforge.org/common-iw",
     "keywords" : "list, popular, articles, interwiki, language, ptwikis",
     "author" : "Danilo.mac",
     "repository": "https://bitbucket.org/danilomac/ptwikis.git"
@@ -30,7 +30,7 @@
     "name" : "ptwikis-ip-patrol",
     "title": "IP Patrolling",
     "description" : "Graphs of the number of edits, patrolled edits and reverted edits in the last 7 or 30 days.",
-    "url" : "https://tools.wmflabs.org/ptwikis/Patrulhamento_de_IPs",
+    "url" : "https://ptwikis.toolforge.org/Patrulhamento_de_IPs",
     "keywords" : "graph, patrol, edits, revert, ptwikis",
     "author" : "Danilo.mac",
     "repository": "https://bitbucket.org/danilomac/ptwikis.git"
@@ -39,7 +39,7 @@
     "name" : "ptwikis-matrix",
     "title": "Matrix of Classification",
     "description" : "Matrix showing the classification of the articleas about a subject in terms of quality and priority.",
-    "url" : "https://tools.wmflabs.org/ptwikis/Matriz",
+    "url" : "https://ptwikis.toolforge.org/Matriz",
     "keywords" : "table, quality, priority, assessment, class, featured, good, ptwikis",
     "author" : "Danilo.mac, Helder",
     "repository": "https://bitbucket.org/danilomac/ptwikis.git"
@@ -48,7 +48,7 @@
     "name" : "ptwikis-mobile",
     "title": "Mobile Interface Usage",
     "description" : "Graph of the edits by registered and unregistered users using the mobile interface in the last 30 days.",
-    "url" : "https://tools.wmflabs.org/ptwikis/Interface_Movel",
+    "url" : "https://ptwikis.toolforge.org/Interface_Movel",
     "keywords" : "graph, mobile, edits, ptwikis",
     "author" : "Danilo.mac",
     "repository": "https://bitbucket.org/danilomac/ptwikis.git"
@@ -57,7 +57,7 @@
     "name" : "ptwikis-lists",
     "title": "Page and User Lists",
     "description" : "Lists of pages or users, based on many criteria (category, template, wikiproject, reversions).",
-    "url" : "https://tools.wmflabs.org/ptwikis/Listas",
+    "url" : "https://ptwikis.toolforge.org/Listas",
     "keywords" : "list, pages, category, template, wikiproject, reversions, ptwikis",
     "author" : "Danilo.mac",
     "repository": "https://bitbucket.org/danilomac/ptwikis.git"
@@ -66,7 +66,7 @@
     "name" : "ptwikis-short-articles",
     "title": "Short Articles",
     "description" : "Table showing the size, category and last edit of the shortest articles, not considering disambiguations",
-    "url" : "https://tools.wmflabs.org/ptwikis/Artigos_curtos",
+    "url" : "https://ptwikis.toolforge.org/Artigos_curtos",
     "keywords" : "table, short, articles, ptwikis",
     "author" : "Danilo.mac",
     "repository": "https://bitbucket.org/danilomac/ptwikis.git"
@@ -75,7 +75,7 @@
     "name" : "ptwikis-visual-editor",
     "title": "VisualEditor Usage",
     "description" : "Graph of the edits by registered and unregistered users using VisualEditor in the last 30 days.",
-    "url" : "https://tools.wmflabs.org/ptwikis/Editor_Visual",
+    "url" : "https://ptwikis.toolforge.org/Editor_Visual",
     "keywords" : "graph, VisualEditor, VE, edits, ptwikis",
     "author" : "Danilo.mac",
     "repository": "https://bitbucket.org/danilomac/ptwikis.git"
@@ -84,7 +84,7 @@
     "name" : "ptwikis-wle-2014",
     "title": "Wiki Loves Earth 2014",
     "description" : "Graph of uploads in Wiki Loves Earth 2014 campaign.",
-    "url" : "https://tools.wmflabs.org/ptwikis/WLE",
+    "url" : "https://ptwikis.toolforge.org/WLE",
     "keywords" : "graph, WLE, photos, commons, images, ptwikis",
     "author" : "Danilo.mac, Henrique",
     "repository": "https://bitbucket.org/danilomac/ptwikis.git"
@@ -93,7 +93,7 @@
     "name" : "ptwikis-timeline",
     "title": "Wikipedia Timeline",
     "description" : "Timeline showing then main events of the History of Portuguese Wikipedia.",
-    "url" : "https://tools.wmflabs.org/ptwikis/Linha_do_tempo",
+    "url" : "https://ptwikis.toolforge.org/Linha_do_tempo",
     "keywords" : "graph, timeline, history, edits, vandalism, ptwikis",
     "author" : "Danilo.mac, Jonas",
     "repository": "https://bitbucket.org/danilomac/ptwikis.git"
