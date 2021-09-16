@@ -113,7 +113,7 @@ var hoverDetailh = new Rickshaw.Graph.HoverDetail( {
 ## Gráfico de barra de todos filtros
 allfilters = u'''{% extends "Tools.html" %}
 {% block head %}
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="//tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <style>.selected td {background-color: #FFE}</style>
         <script>
 var filters = [];
@@ -154,11 +154,12 @@ $(document).ready(function(){
 <p style="float:left"><b>Legend: <span style="background-color:lightgreen">&nbsp; No action match &nbsp;</span> 
 <span style="background-color:#55F; color:white">&nbsp; Warn &nbsp;</span> 
 <span style="background-color:gold">&nbsp; Tag &nbsp;</span> 
-<span style="background-color:red; color:white">&nbsp; Disallow &nbsp;</span></b></p>
+<span style="background-color:red; color:white">&nbsp; Disallow &nbsp;</span>
+<span style="background-color:#807; color:white">&nbsp; Block &nbsp;</span></b></p>
 {% if filters %}
 <input type="button" style="float:right; margin-top:20px" value="Show graph" onclick="showgraph()">
 <table style="width:100%" border=1 rules=rows frame=none bordercolor=lightgray>
-{%- for f, t, n, a, e, d in filters %}
+{%- for f, t, n, a, e, d, b in filters %}
 <tr>
   <td style="width:50px; font-size:1.8em; margin:5px 5px 5px 5px">
     <a href="//{{ link }}.org/wiki/Special:AbuseFilter/{{ f }}" title="{{ t }}">{{ f }}</a>
@@ -167,7 +168,8 @@ $(document).ready(function(){
     <div style="width:{{ (n * 100 / max)|round(1) }}%; height:10px; background-color:lightgreen" title="{{ n }} no action matches about {{ t|lower }}"></div>{% endif %}{% if a %}
     <div style="width:{{ (a * 100 / max)|round(1) }}%; height:10px; background-color:#55F" title="{{ a }} warns about {{ t|lower }}"></div>{% endif %}{% if e %}
     <div style="width:{{ (e * 100 / max)|round(1) }}%; height:10px; background-color:gold" title="{{ e }} tags about {{ t|lower }}"></div>{% endif %}{% if d %}
-    <div style="width:{{ (d * 100 / max)|round(1) }}%; height:10px; background-color:red" title="{{ d }} disallows about {{ t|lower }}"></div>{% endif %}
+    <div style="width:{{ (d * 100 / max)|round(1) }}%; height:10px; background-color:red" title="{{ d }} disallows about {{ t|lower }}"></div>{% endif %}{% if b %}
+    <div style="width:{{ (b * 100 / max)|round(1) }}%; height:10px; background-color:#807" title="{{ d }} blocks about {{ t|lower }}"></div>{% endif %}
   </td>
   <td style="font-size:0.8em; width:8px">
     <input type="checkbox" onchange="checkchange(this)" name="{{ f }}" />
@@ -241,22 +243,23 @@ def main(args=None):
  N,
  A,
  E,
- D
+ D,
+ B
  FROM (
  SELECT
  afl_filter AS F,
  SUM(afl_actions = '') AS N,
  SUM(afl_actions = 'warn') AS A,
  SUM(afl_actions = 'tag') AS E,
- SUM(afl_actions = 'disallow') AS D
+ SUM(afl_actions = 'disallow') AS D,
+ SUM(afl_actions = 'block') AS B
  FROM abuse_filter_log
  WHERE afl_timestamp > DATE_FORMAT(SUBDATE(NOW(), INTERVAL 30 DAY), '%Y%m%d%H%i%s')
  GROUP BY afl_filter) AS stats
  LEFT JOIN abuse_filter
- ON F = af_id
- ORDER BY CAST(F AS INT)''')
+ ON F = af_id''')
         r = c.fetchall()
-        r = [(int(f), t and t.decode('utf8') or u'', int(n), int(a), int(e), int(d)) for f, t, n, a, e, d in r]
+        r = [(f, t and t.decode('utf8') or u'', int(n), int(a), int(e), int(d), int(b)) for f, t, n, a, e, d, b in r]
         r = {'wiki': wiki, 'link': link(wiki), 'filters': r, 'max': max(map(max, [f[2:] for f in r]))}
 	return render_template_string(allfilters, title=wiki + ' Abuse Filter Graphs', **r)
     elif c and filter: # Um ou mais filtros ao longo do tempo

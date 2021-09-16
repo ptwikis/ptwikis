@@ -113,7 +113,7 @@ var hoverDetailh = new Rickshaw.Graph.HoverDetail( {
 ## Gráfico de barra de todos filtros
 allfilters = u'''{% extends "base.html" %}
 {% block head %}
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="//tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <style>.selected td {background-color: #FFE}</style>
         <script>
 var filters = [];
@@ -224,10 +224,9 @@ def main(args=None):
  WHERE afl_timestamp > DATE_FORMAT(SUBDATE(NOW(), INTERVAL 30 DAY), '%Y%m%d%H%i%s')
  GROUP BY afl_filter) AS stats
  LEFT JOIN abuse_filter
- ON F = af_id
- ORDER BY CAST(F AS INT)''')
+ ON F = af_id''')
         r = c.fetchall()
-        r = [(int(f), t and t.decode('utf8') or u'', int(n), int(a), int(e), int(d)) for f, t, n, a, e, d in r]
+        r = [(f, t and t.decode('utf8') or u'', int(n), int(a), int(e), int(d)) for f, t, n, a, e, d in r]
         r = {'wiki': wiki, 'link': link(wiki), 'filters': r, 'max': max(map(max, [f[2:] for f in r]))}
 	return render_template_string(allfilters, title='Filtros', **r)
     elif c and filter: # Um ou mais filtros ao longo do tempo
