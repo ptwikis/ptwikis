@@ -200,7 +200,7 @@ def main(args=None):
     elif args.replace(u'&', u'').replace(u'_', u'').isdigit():
         wiki, filter = u'Wikipédia', args
     elif args.split(':')[0] not in (u'Wikipédia', u'Wikilivros', u'Wikinotícias', u'Wikicionário', u'Wikiversidade', u'Wikiquote', u'Wikisource', u'Wikivoyage'):
-	return redirect('https://ptwikis.toolforge.org/Filters:' + args)
+	return redirect('https://tools.wmflabs.org/ptwikis/Filters:' + args)
     else:
         args = args.split(u':')
         wiki, filter = args[0], len(args) > 1 and args[1]
